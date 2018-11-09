@@ -3,23 +3,17 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
 
-import 'package:beamu/share/config_keys.dart';
-import 'config_keys.dart';
+import 'package:beamu/share/configs.dart';
+import 'package:beamu/model/token_model.dart';
+import 'package:beamu/share/requests.dart';
 
 enum LOGIN_STAT{ failed,success,invalid_host,timeout}
-
-_getConfig() async{
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  var isLogin = prefs.getBool(DONE_LOGIN);
-  return isLogin;
-}
 
 Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) async{
   while(gogsHost.substring(gogsHost.length-1,gogsHost.length) == '/'){
     gogsHost = gogsHost.substring(0,gogsHost.length-1);//remove the last '/'
   }
   var retVal = LOGIN_STAT.failed;
-  Client client = Client();
   var loginUrl = gogsHost+"/api/v1/users/"+username+"/tokens";
   var loginCredential = username+":"+password;
   Map<String,String> header = new Map<String,String>();
@@ -28,44 +22,67 @@ Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) 
   header['Authorization'] = "Basic "+ authentication;
 
   doLogin() async{
-    var rtVal = LOGIN_STAT.failed;
-    final response = await client.get(loginUrl,headers: header).timeout(Duration(seconds: 30),onTimeout: (){
-      rtVal = LOGIN_STAT.timeout;
+    Response rtVal ;
+    final response = await httpGet(loginUrl,header).timeout(Duration(seconds: 30),onTimeout: (){
+      return null;
     });
-    if(rtVal != LOGIN_STAT.timeout){
-      switch(response.statusCode){
-        case 200:
-          rtVal = LOGIN_STAT.success;
-          break;
-        case 401:
-          rtVal = LOGIN_STAT.failed;
-          break;
-        default : // this includes 404
-          rtVal = LOGIN_STAT.invalid_host;
-          break;
-      }
-    }
+    rtVal = response;
+    return rtVal;
+  }
+
+  createToken() async{
+    header['content-type'] = "application/json";
+    String postBody = '{"name":"'+APP_NAME+'"}';
+    Response rtVal;
+    final response = await httpPost(loginUrl,postBody,header).timeout(Duration(seconds: 30),onTimeout: (){
+      return null;
+    });
+    rtVal = response;
     return rtVal;
   }
   
   await doLogin().then((value) async{
-    if(value == LOGIN_STAT.success){
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(DONE_LOGIN, true);
-      await prefs.setString(GOGS_HOST, gogsHost);
-      // TODO: save username and password via secure_storage ,or get access token and save .
+    if(value != null){
+     if(value.statusCode==200){
+          retVal = LOGIN_STAT.success;
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(DONE_LOGIN, true);
+          await config.saveValue(GOGS_HOST, gogsHost);
+          await config.saveValue(USERNAME, username);
+          await config.saveValue(PASSWORD, password);
+
+          //parse response
+          var parsed = json.decode(value.body).cast<Map<String,dynamic>>();
+          List<TokenModel> tokens = parsed.map<TokenModel>((json)=> TokenModel.fromJson(json)).toList();
+
+          TokenModel token ;
+          if(tokens.length>0){
+            token = tokens.firstWhere((w){
+              if(w.name==APP_NAME) return true;
+              else return false;
+            });
+          }
+          
+          if(token == null){//not found,create one
+            var response = await createToken();
+            token = TokenModel.fromJson(json.decode(response.body));
+          }
+          config.setToken(token.sha1);
+      }else if(value.statusCode==401){
+            retVal = LOGIN_STAT.failed;
+      }else{// this includes 404
+            retVal = LOGIN_STAT.invalid_host;
+      }
+    }else{
+      retVal = LOGIN_STAT.timeout;
     }
   });
   return retVal;
 }
 
 Future<bool> loginCHK() async{
-  var retVal = false;
-  await _getConfig().then((onValue){
-    print(onValue);
-    retVal=onValue;
-  });
-  return retVal;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(DONE_LOGIN) && await config.setLocalToken(); // find token locally
 }
 
 

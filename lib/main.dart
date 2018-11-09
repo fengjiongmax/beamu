@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BEAMU',
+      title: 'Beamu',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -25,6 +25,7 @@ class MyHomePage extends StatefulWidget{
 }
 
 class MyHomePageState extends State<MyHomePage>{
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -33,9 +34,11 @@ class MyHomePageState extends State<MyHomePage>{
         if(snapshot.hasData){
           if(snapshot.data){
             return Repositories();
+          }else{
+            return Login();
           }
         }
-        return Login();
+        return Center();
       },
     );
   }

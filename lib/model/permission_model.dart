@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-class Permission{
-  const Permission({
+class PermissionModel{
+  const PermissionModel({
     @required this.admin,
     @required this.push,
     @required this.pull
@@ -11,4 +11,12 @@ class Permission{
   final bool admin;
   final bool push;
   final bool pull;
+
+  factory PermissionModel.fromJson(Map<String,dynamic> json){
+    return PermissionModel(
+      admin: json['admin'],
+      pull: json['pull'],
+      push: json['push']
+    );
+  }
 }
