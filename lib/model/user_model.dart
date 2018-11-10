@@ -6,7 +6,8 @@ class UserModel{
     @required this.username,
     @required this.fullName,
     @required this.email,
-    @required this.avatarUrl
+    @required this.avatarUrl,
+    @required this.login
   })  : assert(id != null),
         assert(username != null),
         assert(email != null);
@@ -15,6 +16,7 @@ class UserModel{
   final String fullName;
   final String email;
   final String avatarUrl;
+  final String login;
 
   factory UserModel.fromJson(Map<String,dynamic> json){
     return UserModel(
@@ -22,7 +24,8 @@ class UserModel{
       username: json['username'],
       fullName: json['fullname'],
       email: json['email'],
-      avatarUrl: json['avatarUrl']
+      avatarUrl: json['avatarUrl'],
+      login: json['login']
     );
   }
 }
