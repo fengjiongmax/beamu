@@ -25,13 +25,21 @@ class RepositoriesListState extends State<RepositoriesList>{
 
     TextStyle _ddlStyle = TextStyle(
       fontWeight: FontWeight.bold,
-      color: Colors.black
+      color: Colors.black,
     );
 
   List<DropdownMenuItem> _buildDDLItems(){
     var _ddlItems = new List<DropdownMenuItem>();
 
-    _ddlItems.add(DropdownMenuItem(child:Text(config.userName,),value: config.userName,));
+    _ddlItems.add(DropdownMenuItem(
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.person,),
+          Text(' '+config.userName),
+        ],
+      ),
+      value: config.userName,
+    ));
     if(_orgLoading){
       _ddlItems.add(DropdownMenuItem(child:Text('fetching organizatin info...', style: TextStyle(color:Colors.grey),),value: null,));
     }
@@ -40,7 +48,13 @@ class RepositoriesListState extends State<RepositoriesList>{
       _ddlItems.addAll(_orgsList.map(
         (o){
           return new DropdownMenuItem(
-            child: Text(o.userName),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.group),
+                Text(' '+o.userName),
+              ],
+
+            ),
             value: o.userName,
           );
         }
@@ -71,18 +85,27 @@ class RepositoriesListState extends State<RepositoriesList>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: DropdownButton(
-          items: _buildDDLItems(),
-          value: _displayUserName,
-          style: _ddlStyle,
-          onChanged: (v){
-            if(v != null){
-              setState(() {
-                            _displayUserName=v;
-                          });
-              }
-          },
-        )
+        title:Text('Repositories'),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(40.0),
+          child:  ListTile(
+            leading: Text("Belongs to",style: TextStyle(color: Colors.white),),
+            trailing: DropdownButton(
+              hint: Text(_displayUserName,style: TextStyle(color: Colors.white),),
+              items: _buildDDLItems(),
+              // value: _displayUserName,
+              style: _ddlStyle,
+              onChanged: (v){
+                if(v != null){
+                  setState(() {
+                                _displayUserName=v;
+                              });
+                  }
+              },
+            ),
+          )
+        ),
+        bottomOpacity: 0.7,
       ),
       body: _repoLoading?Center(child: Text('Fetching repos...'),): buildReposList(context,_reposList,_displayUserName)
     );

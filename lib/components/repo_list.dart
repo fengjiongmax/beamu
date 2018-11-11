@@ -5,8 +5,6 @@ import 'package:beamu/share/time_since.dart';
 
 import 'package:beamu/routes/repository.dart';
 
-
-
 Widget buildReposList(BuildContext context,List<RepositoryModel> reposList,[String username]){
     if(reposList.isEmpty || reposList.length == 0){
       return Center(
@@ -21,8 +19,7 @@ Widget buildReposList(BuildContext context,List<RepositoryModel> reposList,[Stri
     return ListView(
       children: reposList.map((repo){
         String updateSince = 'Updated '+ timeSince(repo.updatedAt);
-        
-        return Container(
+        return Card(
           child: Column(
             children: <Widget>[
               ListTile(
@@ -51,10 +48,9 @@ Widget buildReposList(BuildContext context,List<RepositoryModel> reposList,[Stri
                   );
                 },
               ),
-              new Divider(height: 15.0,color: Colors.grey),
             ],
           ),
         );
-      }).toList()
+      }).toList(),
     );
   }

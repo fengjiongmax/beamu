@@ -3,8 +3,8 @@ String timeSince(DateTime inputTime){
   var timeDiff = DateTime.now().difference(inputTime);
   if(timeDiff.inDays>365){
     timeSince += (timeDiff.inDays/365).round().toString() + " year"+((timeDiff.inDays/365).round()>1?"s":"")+" ago";
-  }else if(timeDiff.inDays>31){
-    timeSince += (timeDiff.inDays/31).round().toString() + " month"+((timeDiff.inDays/31).round()>1?"s":"")+" ago";
+  }else if(timeDiff.inDays>30){
+    timeSince += (timeDiff.inDays/30).round().toString() + " month"+((timeDiff.inDays/30).round()>1?"s":"")+" ago";
   }else if(timeDiff.inDays>0){
     timeSince += timeDiff.inDays.round().toString() + " day"+(timeDiff.inDays.round()>1?"s":"")+" ago";
   }else if(timeDiff.inHours>0){

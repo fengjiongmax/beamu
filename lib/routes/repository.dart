@@ -6,6 +6,8 @@ import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/model/issue_model.dart';
 
 import 'package:beamu/share/time_since.dart';
+import 'issue.dart';
+
 
 class Repository extends StatefulWidget{
   final RepositoryModel repo;
@@ -39,6 +41,7 @@ class RepositoryState extends State<Repository>{
             child: Column(
               children: <Widget>[
                 ListTile(
+                  leading: Text('#'+issue.number.toString()),
                   title: Text(
                     issue.title,
                     softWrap: true,
@@ -52,6 +55,13 @@ class RepositoryState extends State<Repository>{
                       Text(issue.comments.toString())
                     ],
                   ),
+                  onTap: (){
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context)=>Issues(repo: repo,issue: issue)
+                      )
+                    );
+                  },
                 ),
                 Divider(height: 15.0)
               ],
@@ -64,7 +74,7 @@ class RepositoryState extends State<Repository>{
   @override
   void initState(){
     super.initState();
-    getIssues(repo.owner.username, repo.name).then((v){
+    getRepoIssues(repo.owner.username, repo.name).then((v){
       if(this.mounted){
         setState(() {
                 _issues=v;

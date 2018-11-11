@@ -24,7 +24,7 @@ class UserModel{
       username: json['username'],
       fullName: json['fullname'],
       email: json['email'],
-      avatarUrl: json['avatarUrl'],
+      avatarUrl: json['avatar_url'],
       login: json['login']
     );
   }
