@@ -11,6 +11,8 @@ import 'package:beamu/data/issue_data.dart';
 import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/time_since.dart';
 
+import 'text_edit.dart';
+
 class Issues extends StatefulWidget{
   final RepositoryModel repo;
   final IssueModel issue;
@@ -18,7 +20,7 @@ class Issues extends StatefulWidget{
   Issues({@required this.repo,@required this.issue}):super();
 
   @override
-  State<StatefulWidget> createState() => new IssuesState(repo: repo,issue: issue);
+  IssuesState createState() => new IssuesState(repo: repo,issue: issue);
 }
 
 class IssuesState extends State<Issues>{
@@ -90,23 +92,25 @@ class IssuesState extends State<Issues>{
     );
   }
 
-  // @override
-  // void initState(){
-  //   super.initState();
-  //   getIssueComments(repo, issue.number).then((v){
-  //     if(this.mounted){
-  //       _comments.addAll(v);
-  //       _commentsLoading=false;
-  //     }
-  //   });
-  // }
+  @override
+  void initState(){
+    super.initState();
+    print("initiate");
+    // print(_issueInputKey.);
+    // getIssueComments(repo, issue.number).then((v){
+    //   if(this.mounted){
+    //     _comments.addAll(v);
+    //     _commentsLoading=false;
+    //   }
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final _replyController = TextEditingController();
+    // print(_issueInputKey.currentWidget);
     return FutureBuilder(
       future: getIssueComments(repo, issue.number),
-      builder: (contest,snapshot){
+      builder: (context,snapshot){
         if(snapshot.hasData && _commentsLoading){
           _comments.addAll(snapshot.data);
           _commentsLoading = false;
@@ -118,19 +122,11 @@ class IssuesState extends State<Issues>{
               ),
             ),
             body: snapshot.hasData? _buildIssueComment():Center(child: Text('Fetching issue comments...'),),
-            bottomSheet: ListTile(
-              //TODO:TextField lose focus
-              title: TextField(
-                key: Key('reply'),
-                controller: _replyController,
-              ),
-              trailing: RaisedButton(
-                child: Text('Reply'),
-                onPressed: (){
-
-                },
-              ),
-            )
+            floatingActionButton: FloatingActionButton(
+              onPressed: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
+              },
+            ),
           );
       }
     );

@@ -58,8 +58,7 @@ Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) 
           TokenModel token ;
           if(tokens.length>0){
             token = tokens.firstWhere((w){
-              if(w.name==APP_NAME) return true;
-              else return false;
+              return w.name==APP_NAME;
             });
           }
           
@@ -67,7 +66,7 @@ Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) 
             var response = await createToken();
             token = TokenModel.fromJson(json.decode(response.body));
           }
-          config.setToken(token.sha1);
+          await config.setToken(token.sha1);
       }else if(value.statusCode==401){
             retVal = LOGIN_STAT.failed;
       }else{// this includes 404

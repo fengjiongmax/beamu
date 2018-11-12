@@ -32,8 +32,9 @@ class SecureConfigReader{
     await config.delete(key: key);
   }
 
-  setToken(String token) {
-    saveValue(TOKEN, token);
+  setToken(String token) async {
+    await saveValue(TOKEN, token);
+    await setLocalToken();
   }
   
 
