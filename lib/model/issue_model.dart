@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'user_model.dart';
 import 'label_model.dart';
 import 'milestone_model.dart';
-import 'pull_request_model.dart';
+//import 'pull_request_model.dart';
 
 class IssueModel{
   const IssueModel({
@@ -39,13 +39,21 @@ class IssueModel{
   //final PullRequesModel pullRequest;
 
   factory IssueModel.fromJson(Map<String,dynamic> json){
+    List<LabelModel> labels;
+    if(json['labels'] != null){
+      labels = new List<LabelModel>();
+      for(final item in json['labels']){
+        labels.add(LabelModel.fromJson(item));
+      }
+    }
+
     return IssueModel(
       id: json['id'],
       number: json['number'],
       user: UserModel.fromJson(json['user']),
       title: json['title'],
       body: json['body'],
-      labels: json['lables']==null?null: json['lables'].map((item)=> LabelModel.fromJson(item)),
+      labels: labels,
       milestone: json['milestone']==null?null:MilestoneModel.fromJson(json['milestone']),
       assignee: json['assignee']==null? null:UserModel.fromJson(json['assignee']),
       state: json['state'],

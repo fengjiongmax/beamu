@@ -34,53 +34,104 @@ class IssuesState extends State<Issues>{
 
   Widget _buildIssueComment(){
     bool _actionOpen = false;
-    // if(_commentsLoading){
-    //   return Center(child: Text('Fetching issue comments...'),);
-    // }
-    
+    print(issue.labels);
 
     List<Widget> createList = new List<Widget>();
     createList.add(
-      Container(
+      Card(
         child: Column(
           children: <Widget>[
-            ListTile(
-              leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
-              title: MarkdownBody(data: issue.body),
-              subtitle: Text(timeSince(issue.updateAt)),
+            Container(
+              child: ListTile(
+                contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
+                title:  Text(issue.user.username+","+timeSince(issue.createAt)),
+              ),
+              decoration: new BoxDecoration(
+                color: Color.fromARGB(255, 239, 240, 241)
+              ),
             ),
-            Divider(height: 15.0)
+            Container(
+              margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: MarkdownBody(
+                data: issue.body
+              ),
+            ),
+            issue.labels != null && issue.labels.isNotEmpty?
+            Container(
+              height: 35.0,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children:  issue.labels.map((label){
+                  Color colorPicker = new Color(int.parse('0xFF'+label.color));
+                  var y = 0.2126*colorPicker.red + 0.7152*colorPicker.green + 0.0722*colorPicker.blue;
+                  return Container(
+                    height: 12.0,
+                    margin: const EdgeInsets.fromLTRB(10, 0, 0, 10),
+                    padding: const EdgeInsets.all(5.0),
+                    decoration: BoxDecoration(
+                      color:colorPicker
+                    ),
+                    child: Text(
+                      label.name,
+                      style: TextStyle(
+                        color:y<128? Colors.white : Colors.black,
+                      ),
+                    ),
+                  );
+                }).toList()
+              ),
+            )
+            :SizedBox(height: 0),
           ],
         ),
-      ),
+      )
     );
     if(_comments.isNotEmpty || _comments.length>0){
       createList.addAll(
         _comments.map((comment){
           comment.body.isEmpty?_actionOpen=!_actionOpen:_actionOpen=_actionOpen;
-          return Container(
-            child: Column(
+          return comment.body.isNotEmpty?
+          Card(
+            child:  Column(
               children: <Widget>[
-                comment.body.isEmpty?
-                ListTile(
-                  title: Row(
-                    children: <Widget>[
-                      _actionOpen?Icon(Icons.cancel,color: Colors.red,):Icon(Icons.check_box,color: Colors.green),
-                      Image.network(comment.user.avatarUrl,height: 40.0,width: 40.0,),
-                      _actionOpen?Text(' Closed this issue '):Text(' Reopend this issue '),
-                      Text(timeSince(comment.updatedAt),style: TextStyle(color: Colors.grey),)
-                    ],
+                Container(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
+                    title: Text(comment.user.username+","+timeSince(comment.createdAt)),
                   ),
-                )
-                :
-                ListTile(
-                  leading: Image.network(comment.user.avatarUrl,height: 40.0,width: 40.0),
-                  title: MarkdownBody(data:comment.body),
-                  subtitle: Text(timeSince(comment.updatedAt)),
+                  decoration: new BoxDecoration(
+                    color: Color.fromARGB(255, 239, 240, 241)
+                  ),
                 ),
-              Divider(height: 15.0)
+                Container(
+                  margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: MarkdownBody(data: comment.body),
+                )
               ],
-            ),
+            )
+          )
+          :
+          Row(
+            children: <Widget>[
+              SizedBox(width: 12.0),
+              _actionOpen?Icon(Icons.cancel,color: Colors.red,):Icon(Icons.check_box,color: Colors.green),
+              SizedBox(width: 12.0),
+              Image.network(comment.user.avatarUrl,height: 20.0,fit:BoxFit.contain),
+              SizedBox(width: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    (_actionOpen?'Closed by ':' Reopend by ')+comment.user.username+","+timeSince(comment.createdAt),
+                    softWrap: true,
+                  ),
+                ],
+              )
+            ]
           );
         }).toList()
       );
@@ -95,40 +146,31 @@ class IssuesState extends State<Issues>{
   @override
   void initState(){
     super.initState();
-    print("initiate");
-    // print(_issueInputKey.);
-    // getIssueComments(repo, issue.number).then((v){
-    //   if(this.mounted){
-    //     _comments.addAll(v);
-    //     _commentsLoading=false;
-    //   }
-    // });
+    getIssueComments(repo, issue.number).then((v){
+      if(_commentsLoading && this.mounted){
+         setState(() {
+          _comments.addAll(v);
+          _commentsLoading = false;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     // print(_issueInputKey.currentWidget);
-    return FutureBuilder(
-      future: getIssueComments(repo, issue.number),
-      builder: (context,snapshot){
-        if(snapshot.hasData && _commentsLoading){
-          _comments.addAll(snapshot.data);
-          _commentsLoading = false;
-        }
-        return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                issue.title
-              ),
-            ),
-            body: snapshot.hasData? _buildIssueComment():Center(child: Text('Fetching issue comments...'),),
-            floatingActionButton: FloatingActionButton(
-              onPressed: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
-              },
-            ),
-          );
-      }
-    );
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            issue.title
+          ),
+        ),
+        body: _commentsLoading? Center(child: Text('Fetching issue comments...'),):_buildIssueComment(),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: (){
+        //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
+        //   },
+        // ),
+      );
   }
 }
