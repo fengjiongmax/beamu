@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/issue_model.dart';
@@ -7,6 +6,8 @@ import 'package:beamu/model/issue_comment_model.dart';
 import 'package:beamu/model/repository_model.dart';
 
 import 'package:beamu/data/issue_data.dart';
+
+import 'package:beamu/components/markdown_render.dart';
 
 import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/time_since.dart';
@@ -34,7 +35,7 @@ class IssuesState extends State<Issues>{
 
   Widget _buildIssueComment(){
     bool _actionOpen = false;
-    print(issue.labels);
+    // print(issue.labels);
 
     List<Widget> createList = new List<Widget>();
     createList.add(
@@ -54,7 +55,7 @@ class IssuesState extends State<Issues>{
             Container(
               margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: MarkdownBody(
+              child: MarkdownRender(
                 data: issue.body
               ),
             ),
@@ -109,7 +110,7 @@ class IssuesState extends State<Issues>{
                 Container(
                   margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
                   padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  child: MarkdownBody(data: comment.body),
+                  child: MarkdownRender(data: comment.body),
                 )
               ],
             )

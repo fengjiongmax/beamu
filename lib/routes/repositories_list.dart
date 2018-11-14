@@ -84,16 +84,19 @@ class RepositoriesListState extends State<RepositoriesList>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // drawer: Drawer(
+      //   child: Text("Drawer"),
+      // ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title:Text('Repositories'),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(40.0),
-          child:  ListTile(
-            leading: Text("Belongs to",style: TextStyle(color: Colors.white),),
-            trailing: DropdownButton(
+          child: ListTile(
+            title:Text("Belongs to",style: TextStyle(color: Colors.white),),
+            trailing:DropdownButton(
               hint: Text(_displayUserName,style: TextStyle(color: Colors.white),),
               items: _buildDDLItems(),
-              // value: _displayUserName,
               style: _ddlStyle,
               onChanged: (v){
                 if(v != null){
@@ -103,7 +106,7 @@ class RepositoriesListState extends State<RepositoriesList>{
                   }
               },
             ),
-          )
+          ),
         ),
         bottomOpacity: 0.7,
       ),
