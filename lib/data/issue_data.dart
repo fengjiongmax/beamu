@@ -7,8 +7,8 @@ import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 
-Future<List<IssueModel>> getRepoIssues(String userName,String repoName) async{
-  var _url = config.gogsHost+'/api/v1/repos/'+userName+'/'+repoName+'/issues';
+Future<List<IssueModel>> getRepoIssues(RepositoryModel repo) async{
+  var _url = config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues';
 
   var _response = await httpGet(_url);
   if(_response.statusCode == 404) return new List<IssueModel>();

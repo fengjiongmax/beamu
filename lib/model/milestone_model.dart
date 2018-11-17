@@ -29,8 +29,8 @@ class MilestoneModel{
       state: json['state'],
       openIssues: json['open_issues'],
       closedIssues: json['closed_issues'],
-      closedAt: DateTime.parse(json['closed_at']),
-      dueOn:DateTime.parse(json['due_on'])
+      closedAt: json['closed_at'] == null? null : DateTime.parse(json['closed_at']),
+      dueOn: json['due_on'] == null? null : DateTime.parse(json['due_on'])
     );
   }
 }

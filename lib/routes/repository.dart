@@ -87,7 +87,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   void initState(){
     super.initState();
     _tabController = TabController(vsync: this,length: tabContents.length);
-    getRepoIssues(repo.owner.username, repo.name).then((v){
+    getRepoIssues(repo).then((v){
       if(this.mounted){
         setState(() {
           _issues.addAll(v);
@@ -112,7 +112,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoCollaborators(repo).then((v){
       if(this.mounted){
         setState(() {
-          _collaborators.addAll(v)          ;
+          _collaborators.addAll(v);
         });
       }
     });
@@ -313,7 +313,7 @@ class MilestoneList extends StatelessWidget{
             ],
           ),
         ),
-        subtitle: Text(formatter.format(milestone.dueOn)),
+        subtitle: Text(formatter.format(milestone.state=='open'?milestone.dueOn:milestone.closedAt)),
       )
     );
   }
