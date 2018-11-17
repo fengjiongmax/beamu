@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'routes/login.dart';
 import 'routes/repositories_list.dart';
+
+import 'package:beamu/components/loading.dart';
+
 import 'share/authorizations.dart';
 
 void main() => runApp(MyApp());
@@ -38,7 +41,7 @@ class MyHomePageState extends State<MyHomePage>{
             return Login();
           }
         }
-        return Center();
+        return LoadingContent();
       },
     );
   }

@@ -7,6 +7,7 @@ class MilestoneModel{
     @required this.description,
     @required this.state,
     @required this.openIssues,
+    @required this.closedIssues,
     @required this.closedAt,
     @required this.dueOn
   });
@@ -16,6 +17,7 @@ class MilestoneModel{
   final String description;
   final String state;
   final int openIssues;
+  final int closedIssues;
   final DateTime closedAt;
   final DateTime dueOn;
 
@@ -26,6 +28,7 @@ class MilestoneModel{
       description: json['description'],
       state: json['state'],
       openIssues: json['open_issues'],
+      closedIssues: json['closed_issues'],
       closedAt: DateTime.parse(json['closed_at']),
       dueOn:DateTime.parse(json['due_on'])
     );

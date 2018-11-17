@@ -5,19 +5,26 @@ import 'package:beamu/share/time_since.dart';
 
 import 'package:beamu/routes/repository.dart';
 
-Widget buildReposList(BuildContext context,List<RepositoryModel> reposList,[String username]){
-    if(reposList.isEmpty || reposList.length == 0){
+
+class RepositoriesListDisplay extends StatelessWidget{
+  final List<RepositoryModel> repoList;
+  final String userName;
+
+  RepositoriesListDisplay({this.repoList,this.userName,Key key}):super(key:key);
+
+  @override
+  Widget build(BuildContext context){
+    if(repoList.isEmpty || repoList.length == 0){
       return Center(
         child: Text('0 repository.'),
       );
     }
 
-    if(username.isNotEmpty){
-      reposList = reposList.where((w){return w.owner.username == username;}).toList();
-    }
+    final List<RepositoryModel> _renderRepoList = userName.isNotEmpty?  repoList.where((w){return w.owner.username == userName;}).toList()
+                                                                      : repoList;
 
     return ListView(
-      children: reposList.map((repo){
+      children: _renderRepoList.map((repo){
         String updateSince = 'Updated '+ timeSince(repo.updatedAt);
         return Card(
           child: Column(
@@ -54,3 +61,4 @@ Widget buildReposList(BuildContext context,List<RepositoryModel> reposList,[Stri
       }).toList(),
     );
   }
+}

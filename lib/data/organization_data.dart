@@ -15,3 +15,13 @@ Future<List<OrganizationModel>> getSelfOrganizations() async{
   List<OrganizationModel> orgs = _parsed.map<OrganizationModel>((json)=> OrganizationModel.fromJson(json)).toList();
   return orgs;
 }
+
+Future<List<OrganizationModel>> getUserOrganizations(String userName) async{
+  final url = config.gogsHost+'/api/v1/users/'+userName+'/orgs';
+
+  final response = await httpGet(url);
+  final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
+
+  List<OrganizationModel> orgs = _parsed.map<OrganizationModel>((json)=> OrganizationModel.fromJson(json)).toList();
+  return orgs;
+}

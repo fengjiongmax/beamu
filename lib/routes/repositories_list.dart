@@ -8,6 +8,8 @@ import 'package:beamu/data/organization_data.dart';
 import 'package:beamu/share/configs.dart';
 
 import 'package:beamu/components/repo_list.dart';
+import 'package:beamu/components/loading.dart';
+import 'package:beamu/components/drawer.dart';
 
 class RepositoriesList extends StatefulWidget{
   @override
@@ -41,7 +43,7 @@ class RepositoriesListState extends State<RepositoriesList>{
       value: config.userName,
     ));
     if(_orgLoading){
-      _ddlItems.add(DropdownMenuItem(child:Text('fetching organizatin info...', style: TextStyle(color:Colors.grey),),value: null,));
+      _ddlItems.add(DropdownMenuItem(child: LoadingContent(),value: null,));
     }
 
     if(_orgsList.isNotEmpty && _orgsList.length>0){
@@ -84,9 +86,7 @@ class RepositoriesListState extends State<RepositoriesList>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // drawer: Drawer(
-      //   child: Text("Drawer"),
-      // ),
+      drawer: BeamuDrawer(),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title:Text('Repositories'),
@@ -110,7 +110,8 @@ class RepositoriesListState extends State<RepositoriesList>{
         ),
         bottomOpacity: 0.7,
       ),
-      body: _repoLoading?Center(child: Text('Fetching repos...'),): buildReposList(context,_reposList,_displayUserName)
+      body: _repoLoading? Center(child: LoadingContent(),)
+                        : RepositoriesListDisplay(repoList: _reposList,userName: _displayUserName,)
     );
   }
 }

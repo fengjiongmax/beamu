@@ -1,6 +1,6 @@
+import 'package:beamu/components/drawer.dart';
 import 'package:flutter/material.dart';
 
-import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 import 'package:beamu/model/repository_model.dart';
@@ -8,17 +8,15 @@ import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/data/issue_data.dart';
 
 import 'package:beamu/components/markdown_render.dart';
+import 'package:beamu/components/loading.dart';
 
-import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/time_since.dart';
-
-import 'text_edit.dart';
 
 class Issues extends StatefulWidget{
   final RepositoryModel repo;
   final IssueModel issue;
 
-  Issues({@required this.repo,@required this.issue}):super();
+  Issues({@required this.repo,@required this.issue,Key key}):super(key:key);
 
   @override
   IssuesState createState() => new IssuesState(repo: repo,issue: issue);
@@ -89,7 +87,10 @@ class IssuesState extends State<Issues>{
         ),
       )
     );
-    if(_comments.isNotEmpty || _comments.length>0){
+
+    if(_commentsLoading){
+      createList.add(LoadingContent());
+    } else if(_comments.isNotEmpty || _comments.length>0){
       createList.addAll(
         _comments.map((comment){
           comment.body.isEmpty?_actionOpen=!_actionOpen:_actionOpen=_actionOpen;
@@ -161,17 +162,25 @@ class IssuesState extends State<Issues>{
   Widget build(BuildContext context) {
     // print(_issueInputKey.currentWidget);
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            issue.title
-          ),
+      drawer: BeamuDrawer(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Navigator.pop(context);
+          },
         ),
-        body: _commentsLoading? Center(child: Text('Fetching issue comments...'),):_buildIssueComment(),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: (){
-        //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
-        //   },
-        // ),
-      );
+        title: Text(
+          issue.title
+        ),
+      ),
+      body: _buildIssueComment(),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: (){
+      //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
+      //   },
+      // ),
+    );
   }
 }

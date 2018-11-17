@@ -84,4 +84,9 @@ Future<bool> loginCHK() async{
   return prefs.getBool(DONE_LOGIN) && await config.setLocalToken(); // find token locally
 }
 
+Future<bool> logout() async{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+  return await config.clearAll();
+}
 

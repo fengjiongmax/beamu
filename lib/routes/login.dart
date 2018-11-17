@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:beamu/share/authorizations.dart';
 
 import 'repositories_list.dart';
-import 'package:beamu/share/configs.dart';
 
 class Login extends StatefulWidget{
   @override

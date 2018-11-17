@@ -7,6 +7,7 @@ const GOGS_HOST = 'GOGS_Host';
 const USERNAME = 'UserName';
 const PASSWORD = 'Password';
 const TOKEN = 'Token';
+const AVATAR = 'Avatar';
 
 const APP_NAME='BEAMU';
 
@@ -16,6 +17,7 @@ class SecureConfigReader{
   String userToken;
   String userName;
   String gogsHost;
+  String avatar;
 
   final FlutterSecureStorage config = new FlutterSecureStorage();
 
@@ -36,18 +38,23 @@ class SecureConfigReader{
     await saveValue(TOKEN, token);
     await setLocalToken();
   }
-  
 
+  clearAll() async{
+    await config.deleteAll();
+  }
+  
   Future<bool> setLocalToken() async{
     var result = false;
     var _config = await config.readAll();
     if(_config[GOGS_HOST] != null && _config[GOGS_HOST].length>0
       && _config[USERNAME] != null && _config[USERNAME].length>0
-      && _config[TOKEN] != null && _config[TOKEN].length>0)
+      && _config[TOKEN] != null && _config[TOKEN].length>0
+       )
       {
         gogsHost = _config[GOGS_HOST];
         userName = _config[USERNAME];
         userToken = _config[TOKEN];
+        // avatar = _config[AVATAR];
         result = true;
       }
 
