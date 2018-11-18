@@ -4,6 +4,8 @@ import 'package:beamu/share/authorizations.dart';
 import 'package:beamu/share/configs.dart';
 
 import 'package:beamu/routes/login.dart';
+import 'package:beamu/routes/organization_list.dart';
+import 'package:beamu/routes/repositories_list.dart';
 
 class BeamuDrawer extends StatelessWidget{
   @override
@@ -28,17 +30,23 @@ class BeamuDrawer extends StatelessWidget{
           ListTile(
             leading: Icon(Icons.book),
             title: Text('Repositories'),
-            onTap: (){
-
+            onTap: () async{
+              await logout();
+              Navigator.pushReplacement(context,
+               MaterialPageRoute(builder: (BuildContext context) =>RepositoriesList())
+              );
             },
           ),
-          // ListTile(
-          //   leading: Icon(Icons.group),
-          //   title: Text('Organizations'),
-          //   onTap: (){
-
-          //   },
-          // ),
+          ListTile(
+            leading: Icon(Icons.group),
+            title: Text('Organizations'),
+            onTap: () async{
+              await logout();
+              Navigator.pushReplacement(context,
+               MaterialPageRoute(builder: (BuildContext context) =>OrganizationList())
+              );
+            },
+          ),
           // ListTile(
           //   leading: Icon(Icons.announcement),
           //   title: Text('Assigned issues'),

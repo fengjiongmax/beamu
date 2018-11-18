@@ -1,4 +1,4 @@
-library secure_config;
+// library secure_config;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

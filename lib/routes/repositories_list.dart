@@ -6,7 +6,9 @@ import 'package:beamu/model/organization_model.dart';
 
 import 'package:beamu/data/repository_data.dart';
 import 'package:beamu/data/organization_data.dart';
+
 import 'package:beamu/share/configs.dart';
+import 'package:beamu/share/tmp_store.dart';
 
 import 'package:beamu/components/repo_list.dart';
 import 'package:beamu/components/loading.dart';
@@ -77,6 +79,7 @@ class RepositoriesListState extends State<RepositoriesList>{
             });
     });
     getSelfOrganizations().then((v){
+      tmpStorage.orgs = v;
       setState(() {
               _orgsList.addAll(v);
               _orgLoading = false;
