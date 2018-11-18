@@ -69,7 +69,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                   onPressed: () async{
                     Clipboard.setData(ClipboardData(text: k.url)).then((v){
                       final snackBar = SnackBar(
-                        content: Text('Copied!'),
+                        content: Text('Copied to clipboard'),
                       );
                       Scaffold.of(curContext).showSnackBar(snackBar);
                     });
@@ -197,10 +197,6 @@ const List<Choice> tabContents = const <Choice>[
   const Choice(title: 'LABELS'),
   const Choice(title: 'URLS')
 ];
-
-// class TabContent extends StatefulWidget{
-
-// }
 
 class IssueList extends StatelessWidget{
   final RepositoryModel repo;

@@ -1,3 +1,4 @@
+import 'package:beamu/share/authorizations.dart';
 import 'package:flutter/material.dart';
 
 import 'package:beamu/model/repository_model.dart';
@@ -80,6 +81,9 @@ class RepositoriesListState extends State<RepositoriesList>{
               _orgsList.addAll(v);
               _orgLoading = false;
             });
+    });
+    getUserInfo().then((v){
+      config.setUserAvatar(v.avatarUrl);
     });
   }
 

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:beamu/model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
 
-import 'package:beamu/share/configs.dart';
+import 'package:beamu/data/user_data.dart';
 import 'package:beamu/model/token_model.dart';
+import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/requests.dart';
 
 enum LOGIN_STAT{ failed,success,invalid_host,timeout}
@@ -79,9 +81,14 @@ Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) 
   return retVal;
 }
 
+Future<UserModel> getUserInfo() async{
+  var user = await getUser(config.userName);
+  return user;
+}
+
 Future<bool> loginCHK() async{
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(DONE_LOGIN) && await config.setLocalToken(); // find token locally
+  return prefs.getBool(DONE_LOGIN) && await config.setLoginToken(); // find token locally
 }
 
 Future<bool> logout() async{

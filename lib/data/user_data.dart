@@ -6,12 +6,12 @@ import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/share/requests.dart';
 import 'package:beamu/share/configs.dart';
 
-Future<UserModel> getUserInfo(String userName) async{
-  final url = config.gogsHost+'/api/v1/user/'+config.userName;
+Future<UserModel> getUser(String userName) async{
+  final url = config.gogsHost+'/api/v1/users/'+userName;
   final response = await httpGet(url);
 
-  final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
-  UserModel user = _parsed.map<UserModel>((json)=>UserModel.fromJson(json));
+  final _parsed = json.decode(response.body);
+  UserModel user = UserModel.fromJson(_parsed);
   return user;
 }
 
