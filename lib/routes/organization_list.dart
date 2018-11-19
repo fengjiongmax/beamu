@@ -11,7 +11,6 @@ import 'package:beamu/share/tmp_store.dart';
 class OrganizationList extends StatefulWidget{
   @override
   OrganizationListState createState() => new OrganizationListState();
-
 }
 
 class OrganizationListState extends State<OrganizationList>{

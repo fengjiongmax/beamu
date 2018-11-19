@@ -30,8 +30,8 @@ class BeamuDrawer extends StatelessWidget{
           ListTile(
             leading: Icon(Icons.book),
             title: Text('Repositories'),
-            onTap: () async{
-              await logout();
+            onTap: () {
+              Navigator.of(context).pop();
               Navigator.pushReplacement(context,
                MaterialPageRoute(builder: (BuildContext context) =>RepositoriesList())
               );
@@ -40,8 +40,8 @@ class BeamuDrawer extends StatelessWidget{
           ListTile(
             leading: Icon(Icons.group),
             title: Text('Organizations'),
-            onTap: () async{
-              await logout();
+            onTap: () {
+              Navigator.of(context).pop();
               Navigator.pushReplacement(context,
                MaterialPageRoute(builder: (BuildContext context) =>OrganizationList())
               );
@@ -67,6 +67,7 @@ class BeamuDrawer extends StatelessWidget{
             title: Text('Logout'),
             onTap: () async{
               await logout();
+              Navigator.of(context).pop();
               Navigator.pushReplacement(context,
                MaterialPageRoute(builder: (BuildContext context) =>Login())
               );

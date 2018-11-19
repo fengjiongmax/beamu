@@ -70,6 +70,7 @@ class _LoginState extends State<Login>{
                       });
                       loginAction(_userNameController.text, _passwordController.text, _gogsHostController.text).then((v){
                         if(v == LOGIN_STAT.success){
+                          Navigator.of(context).pop();
                           Navigator.push(context, MaterialPageRoute(builder: (context) => RepositoriesList()));
                         }
                       });
