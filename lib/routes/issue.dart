@@ -1,6 +1,8 @@
 import 'package:beamu/components/drawer.dart';
 import 'package:flutter/material.dart';
 
+import 'package:beamu/routes/text_edit.dart';
+
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 import 'package:beamu/model/repository_model.dart';
@@ -11,6 +13,7 @@ import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/loading.dart';
 
 import 'package:beamu/share/time_since.dart';
+import 'package:beamu/share/configs.dart';
 
 class Issues extends StatefulWidget{
   final RepositoryModel repo;
@@ -45,6 +48,17 @@ class IssuesState extends State<Issues>{
                 contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                 leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
                 title:  Text(issue.user.username+","+timeSince(issue.createAt)),
+                trailing: issue.user.username==config.userName?
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: (){
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context)=>Editor(url: '',content:issue.body,method:FINISH_METHOD.PATCH))
+                      );
+                    },
+                  )
+                  : 
+                  null,
               ),
               decoration: new BoxDecoration(
                 color: Color.fromARGB(255, 239, 240, 241)
@@ -103,6 +117,17 @@ class IssuesState extends State<Issues>{
                     contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                     leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
                     title: Text(comment.user.username+","+timeSince(comment.createdAt)),
+                    trailing: comment.user.username==config.userName?
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: (){
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context)=>Editor(url: '',content:comment.body,method:FINISH_METHOD.PATCH))
+                          );
+                        },
+                      )
+                      : 
+                      null,
                   ),
                   decoration: new BoxDecoration(
                     color: Color.fromARGB(255, 239, 240, 241)

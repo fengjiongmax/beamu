@@ -8,6 +8,7 @@ import 'milestone_model.dart';
 class IssueModel{
   const IssueModel({
     @required this.id,
+    @required this.url,
     @required this.number,
     @required this.user,
     @required this.title,
@@ -15,6 +16,7 @@ class IssueModel{
     @required this.labels,
     @required this.milestone,
     @required this.assignee,
+    @required this.assignees,
     @required this.state,
     @required this.comments,
     @required this.createAt,
@@ -23,6 +25,7 @@ class IssueModel{
   });
 
   final int id;
+  final String url;
   final int number;
   final UserModel user;
   final String title;
@@ -30,6 +33,7 @@ class IssueModel{
   final List<LabelModel> labels;
   final MilestoneModel milestone;
   final UserModel assignee;
+  final List<UserModel> assignees;
   final String state;
   final int comments;
   final DateTime createAt;
@@ -47,8 +51,17 @@ class IssueModel{
       }
     }
 
+    List<UserModel> assignees;
+    if(json['assignees'] != null){
+      assignees = new List<UserModel>();
+      for(final item in json['assignees']){
+        assignees.add(UserModel.fromJson(item));
+      }
+    }
+
     return IssueModel(
       id: json['id'],
+      url: json['url'],
       number: json['number'],
       user: UserModel.fromJson(json['user']),
       title: json['title'],
@@ -56,6 +69,7 @@ class IssueModel{
       labels: labels,
       milestone: json['milestone']==null?null:MilestoneModel.fromJson(json['milestone']),
       assignee: json['assignee']==null? null:UserModel.fromJson(json['assignee']),
+      assignees: assignees,
       state: json['state'],
       comments: json['comments'],
       createAt: DateTime.parse(json['created_at']),

@@ -20,3 +20,11 @@ Future<Response> httpPost(String url,dynamic body,[Map<String,String> header]) a
                           headers:header == null?_defaultHeader:header
                           );
 }
+
+Future<Response> httpPatch(String url,dynamic body,[Map<String,String> header]) async{
+  Client client = Client();
+  return await client.patch(Uri.encodeFull(url),
+                            body: body,
+                            headers: header==null? _defaultHeader:header
+                            );
+}

@@ -58,7 +58,6 @@ class RepositoriesListState extends State<RepositoriesList>{
                 Icon(Icons.group),
                 Text(' '+o.userName),
               ],
-
             ),
             value: o.userName,
           );
