@@ -31,6 +31,7 @@ class IssuesState extends State<Issues>{
   var _comments = new List<IssueCommentModel>();
   
   bool _commentsLoading = true;
+  bool _issueUpdated = false;
 
   IssuesState({@required this.repo,@required this.issue}):super();
 
@@ -53,7 +54,10 @@ class IssuesState extends State<Issues>{
                     icon: Icon(Icons.edit),
                     onPressed: (){
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context)=>Editor(url: '',content:issue.body,method:FINISH_METHOD.PATCH))
+                        MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString()
+                                                                    ,method:FINISH_METHOD.PATCH
+                                                                    ,issue: issue
+                                                                    ,body: BODY.ISSUE,))
                       );
                     },
                   )
@@ -117,17 +121,20 @@ class IssuesState extends State<Issues>{
                     contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                     leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
                     title: Text(comment.user.username+","+timeSince(comment.createdAt)),
-                    trailing: comment.user.username==config.userName?
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: (){
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context)=>Editor(url: '',content:comment.body,method:FINISH_METHOD.PATCH))
-                          );
-                        },
-                      )
-                      : 
-                      null,
+                    // trailing: comment.user.username==config.userName?
+                    //   IconButton(
+                    //     icon: Icon(Icons.edit),
+                    //     onPressed: (){
+                    //       Navigator.of(context).push(
+                    //         MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/issues/comments/'+comment.id.toString()
+                    //                                                     ,method:FINISH_METHOD.PATCH
+                    //                                                     ,body: BODY.COMMENT
+                    //                                                     ,comment: comment,))
+                    //       );
+                    //     },
+                    //   )
+                    //   : 
+                    //   null,
                   ),
                   decoration: new BoxDecoration(
                     color: Color.fromARGB(255, 239, 240, 241)
@@ -169,6 +176,10 @@ class IssuesState extends State<Issues>{
       children: createList
     );
   }
+  
+  Future<bool> _onWillPop() async{
+    return _issueUpdated;
+  }
 
   @override
   void initState(){
@@ -178,6 +189,7 @@ class IssuesState extends State<Issues>{
          setState(() {
           _comments.addAll(v);
           _commentsLoading = false;
+          _issueUpdated = true;
         });
       }
     });
@@ -186,26 +198,43 @@ class IssuesState extends State<Issues>{
   @override
   Widget build(BuildContext context) {
     // print(_issueInputKey.currentWidget);
-    return Scaffold(
-      drawer: BeamuDrawer(),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: (){
-            Navigator.pop(context);
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        drawer: BeamuDrawer(),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: (){
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            issue.title
+          ),
+        ),
+        body: _buildIssueComment(),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add_comment),
+          onPressed: () async{
+            var result = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (context)=> Editor(url: config.gogsHost+'/api/v1/repos/'
+                                                                                          +repo.owner.username+'/'
+                                                                                          +repo.name+'/issues/'
+                                                                                          +issue.number.toString()+'/comments'
+                                                        ,body: BODY.COMMENT
+                                                        ,method: FINISH_METHOD.POST,)));
+            if(result && this.mounted){
+              _issueUpdated = true;
+              var _retList = await getIssueComments(repo, issue.number);
+              setState(() {
+                _comments.clear();
+                _comments.addAll(_retList);
+              });
+            }
           },
         ),
-        title: Text(
-          issue.title
-        ),
       ),
-      body: _buildIssueComment(),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: (){
-      //     Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Editor()));
-      //   },
-      // ),
     );
   }
 }
