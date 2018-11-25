@@ -1,26 +1,21 @@
-import 'package:flutter/foundation.dart';
-
 class OrganizationModel{
-  const OrganizationModel({
-    @required this.id ,
-    @required this.userName,
-    @required this.fullName,
-    @required this.avatarUrl,
-    @required this.description,
-    @required this.website,
-    @required this.location
-  })  : assert(id != null),
-        assert(userName != null),
-        assert(avatarUrl != null);
+  OrganizationModel({
+    this.id ,
+    this.userName,
+    this.fullName,
+    this.avatarUrl,
+    this.description,
+    this.website,
+    this.location
+  });
 
-
-  final int id;
-  final String userName;
-  final String fullName;
-  final String avatarUrl;
-  final String description;
-  final String website;
-  final String location;
+  int id;
+  String userName;
+  String fullName;
+  String avatarUrl;
+  String description;
+  String website;
+  String location;
 
   factory OrganizationModel.fromJson(Map<String,dynamic> json){
     return OrganizationModel(

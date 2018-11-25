@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
 
 class LabelModel{
-  const LabelModel({
-    @required this.id,
-    @required this.name,
-    @required this.color,
-    @required this.url
+  LabelModel({
+    this.id,
+    this.name,
+    this.color,
+    this.url
   });
 
-  final int id;
-  final String name;
-  final String color;
-  final String url;
+  int id;
+  String name;
+  String color;
+  String url;
 
   factory LabelModel.fromJson(Map<String,dynamic> json){
     return LabelModel(

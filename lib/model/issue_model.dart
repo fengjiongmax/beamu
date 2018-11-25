@@ -1,43 +1,41 @@
-import 'package:flutter/foundation.dart';
-
 import 'user_model.dart';
 import 'label_model.dart';
 import 'milestone_model.dart';
 //import 'pull_request_model.dart';
 
 class IssueModel{
-  const IssueModel({
-    @required this.id,
-    @required this.url,
-    @required this.number,
-    @required this.user,
-    @required this.title,
-    @required this.body,
-    @required this.labels,
-    @required this.milestone,
-    @required this.assignee,
-    @required this.assignees,
-    @required this.state,
-    @required this.comments,
-    @required this.createAt,
-    @required this.updateAt
+  IssueModel({
+    this.id,
+    this.url,
+    this.number,
+    this.user,
+    this.title,
+    this.body,
+    this.labels,
+    this.milestone,
+    this.assignee,
+    this.assignees,
+    this.state,
+    this.comments,
+    this.createAt,
+    this.updateAt
     //@required this.PullRequest
   });
 
-  final int id;
-  final String url;
-  final int number;
-  final UserModel user;
-  final String title;
-  final String body;
-  final List<LabelModel> labels;
-  final MilestoneModel milestone;
-  final UserModel assignee;
-  final List<UserModel> assignees;
-  final String state;
-  final int comments;
-  final DateTime createAt;
-  final DateTime updateAt;
+  int id;
+  String url;
+  int number;
+  UserModel user;
+  String title;
+  String body;
+  List<LabelModel> labels;
+  MilestoneModel milestone;
+  UserModel assignee;
+  List<UserModel> assignees;
+  String state;
+  int comments;
+  DateTime createAt;
+  DateTime updateAt;
 
   //pull requests are not inplemented in gogs api v1 yet
   //final PullRequesModel pullRequest;
@@ -77,4 +75,39 @@ class IssueModel{
       //pullRequest: PullRequest.fromJson(json['pull_request'])
     );
   }
+}
+
+
+class SubmitIssueModel{
+  SubmitIssueModel({this.assignee,this.assignees,this.body,this.dueDate,this.milestone,this.state,this.title});
+
+  UserModel assignee;
+  List<UserModel> assignees;
+  String body;
+  DateTime dueDate;
+  MilestoneModel milestone;
+  String state;
+  String title;
+
+  factory SubmitIssueModel.fromIssue(IssueModel issue){
+    return SubmitIssueModel(
+      assignee:issue.assignee,
+      assignees: issue.assignees,
+      body:  issue.body,
+      // dueDate: issue.
+      milestone: issue.milestone,
+      state: issue.state,
+      title: issue.title
+    );
+  }
+
+  Map<String,dynamic> toJson()=>{
+    'assignee':assignee,
+    'assignees': assignees,
+    'body':  body,
+    // dueDate: issue.
+    'milestone': milestone,
+    'state': state,
+    'title': title
+  };
 }

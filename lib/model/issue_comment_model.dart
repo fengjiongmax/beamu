@@ -1,23 +1,21 @@
-import 'package:flutter/foundation.dart';
-
 import 'user_model.dart';
 
 class IssueCommentModel{
-  const IssueCommentModel({
-    @required this.id,
-    @required this.htmlUrl,
-    @required this.user,
-    @required this.body,
-    @required this.createdAt,
-    @required this.updatedAt
+  IssueCommentModel({
+    this.id,
+    this.htmlUrl,
+    this.user,
+    this.body,
+    this.createdAt,
+    this.updatedAt
   });
 
-  final int id;
-  final String htmlUrl;
-  final UserModel user;
-  final String body;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  int id;
+  String htmlUrl;
+  UserModel user;
+  String body;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   factory IssueCommentModel.fromJson(Map<String,dynamic> json){
     return IssueCommentModel(

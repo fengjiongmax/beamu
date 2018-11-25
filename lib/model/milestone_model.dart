@@ -1,25 +1,23 @@
-import 'package:flutter/foundation.dart';
-
 class MilestoneModel{
-  const MilestoneModel({
-    @required this.id,
-    @required this.title,
-    @required this.description,
-    @required this.state,
-    @required this.openIssues,
-    @required this.closedIssues,
-    @required this.closedAt,
-    @required this.dueOn
+  MilestoneModel({
+    this.id,
+    this.title,
+    this.description,
+    this.state,
+    this.openIssues,
+    this.closedIssues,
+    this.closedAt,
+    this.dueOn
   });
 
-  final int id;
-  final String title;
-  final String description;
-  final String state;
-  final int openIssues;
-  final int closedIssues;
-  final DateTime closedAt;
-  final DateTime dueOn;
+  int id;
+  String title;
+  String description;
+  String state;
+  int openIssues;
+  int closedIssues;
+  DateTime closedAt;
+  DateTime dueOn;
 
   factory MilestoneModel.fromJson(Map<String,dynamic> json){
     return MilestoneModel(

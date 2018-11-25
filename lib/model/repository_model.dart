@@ -1,56 +1,54 @@
-import 'package:flutter/foundation.dart';
-
 import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/permission_model.dart';
 
 class RepositoryModel{
-  const RepositoryModel({
-    @required this.id,
-    @required this.owner,
-    @required this.name,
-    @required this.fullName,
-    @required this.description,
-    @required this.private,
-    @required this.fork,
-    @required this.parent,
-    @required this.empty,
-    @required this.mirror,
-    @required this.size,
-    @required this.htmlUrl,
-    @required this.sshUrl,
-    @required this.cloneUrl,
-    @required this.website,
-    @required this.startsCount,
-    @required this.forksCount,
-    @required this.openIssuesCount,
-    @required this.defaultBranch,
-    @required this.createdAt,
-    @required this.updatedAt,
-    @required this.permissions,
+  RepositoryModel({
+    this.id,
+    this.owner,
+    this.name,
+    this.fullName,
+    this.description,
+    this.private,
+    this.fork,
+    this.parent,
+    this.empty,
+    this.mirror,
+    this.size,
+    this.htmlUrl,
+    this.sshUrl,
+    this.cloneUrl,
+    this.website,
+    this.startsCount,
+    this.forksCount,
+    this.openIssuesCount,
+    this.defaultBranch,
+    this.createdAt,
+    this.updatedAt,
+    this.permissions,
   });
 
-  final int id;
-  final UserModel owner;
-  final String name;
-  final String fullName;
-  final String description;
-  final bool private;
-  final bool fork;
-  final RepositoryModel parent;
-  final bool empty;
-  final bool mirror;
-  final int size;
-  final String htmlUrl;
-  final String sshUrl;
-  final String cloneUrl;
-  final String website;
-  final int startsCount;
-  final int forksCount;
-  final int openIssuesCount;
-  final String defaultBranch;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final PermissionModel permissions;
+  int id;
+  UserModel owner;
+  String name;
+  String fullName;
+  String description;
+  bool private;
+  bool fork;
+  RepositoryModel parent;
+  bool empty;
+  bool mirror;
+  int size;
+  String htmlUrl;
+  String sshUrl;
+  String cloneUrl;
+  String website;
+  int startsCount;
+  int forksCount;
+  int openIssuesCount;
+  String defaultBranch;
+  DateTime createdAt;
+  DateTime updatedAt;
+  PermissionModel permissions;
 
   factory RepositoryModel.fromJson(Map<String,dynamic> json){
     return RepositoryModel(
