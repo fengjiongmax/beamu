@@ -25,13 +25,16 @@ class Issues extends StatefulWidget{
   IssuesState createState() => new IssuesState(repo: repo,issue: issue);
 }
 
+//TODO:use tabview to render issue:issue/comments,labels,milestone,assignees,participants
 class IssuesState extends State<Issues>{
   final RepositoryModel repo;
   final IssueModel issue;
+  TextEditingController _titleEditController;
+
   var _comments = new List<IssueCommentModel>();
-  
   bool _commentsLoading = true;
   bool _issueUpdated = false;
+  bool _editTitle = false;
 
   IssuesState({@required this.repo,@required this.issue}):super();
 
@@ -126,7 +129,9 @@ class IssuesState extends State<Issues>{
                     //     icon: Icon(Icons.edit),
                     //     onPressed: (){
                     //       Navigator.of(context).push(
-                    //         MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/issues/comments/'+comment.id.toString()
+                    //         MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'
+                    //                                                                          +repo.owner.username+'/issues/comments/'
+                    //                                                                          +comment.id.toString()
                     //                                                     ,method:FINISH_METHOD.PATCH
                     //                                                     ,body: BODY.COMMENT
                     //                                                     ,comment: comment,))
@@ -193,7 +198,28 @@ class IssuesState extends State<Issues>{
         });
       }
     });
+    _titleEditController = new TextEditingController(text: issue.title);
   }
+
+  PreferredSizeWidget _editIssueTitle(){
+    return AppBar(
+      automaticallyImplyLeading: false,
+      title: TextField(
+        controller: _titleEditController,
+      ),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.save),
+          onPressed: (){
+            //TODO:edit issue title
+            // var _toSubmitIssue = issue;
+            // issue.title = _titleEditController.text;
+            
+          },
+        )
+      ],
+    );
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -213,17 +239,50 @@ class IssuesState extends State<Issues>{
           title: Text(
             issue.title
           ),
+          actions: repo.owner.username == config.userName && issue.user.username == config.userName ?
+            <Widget>[            
+              PopupMenuButton(
+                onSelected: (PopChoice v){
+                  switch(v.title){
+                    case 'Edit Title':
+                      setState(() {
+                        _editTitle=true;
+                      });
+                      print("editing!");
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context){
+                  return popChoices.map((choice){
+                    return PopupMenuItem<PopChoice>(
+                      value: choice,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(choice.icon),
+                          SizedBox(width: 5,),
+                          Text(choice.title)
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+              )
+            ]
+            :null,
         ),
         body: _buildIssueComment(),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add_comment),
           onPressed: () async{
-            var result = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (context)=> Editor(url: config.gogsHost+'/api/v1/repos/'
-                                                                                          +repo.owner.username+'/'
-                                                                                          +repo.name+'/issues/'
-                                                                                          +issue.number.toString()+'/comments'
-                                                        ,body: BODY.COMMENT
-                                                        ,method: FINISH_METHOD.POST,)));
+            var result = await Navigator.of(context).push<bool>(
+              MaterialPageRoute(
+                builder: (context)=> Editor(url: config.gogsHost+'/api/v1/repos/'
+                                                                +repo.owner.username+'/'
+                                                                +repo.name+'/issues/'
+                                                                +issue.number.toString()+'/comments'
+                                            ,body: BODY.COMMENT
+                                            ,method: FINISH_METHOD.POST,))
+            );
             if(result && this.mounted){
               _issueUpdated = true;
               var _retList = await getIssueComments(repo, issue.number);
@@ -238,3 +297,15 @@ class IssuesState extends State<Issues>{
     );
   }
 }
+
+
+class PopChoice{
+  const PopChoice({this.title,this.icon});
+
+  final String title;
+  final IconData icon;
+}
+
+const List<PopChoice> popChoices = const <PopChoice>[
+  const PopChoice(title: 'Edit Title',icon: Icons.border_color)
+];

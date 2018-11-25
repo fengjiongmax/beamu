@@ -18,7 +18,7 @@ enum BODY{
   ISSUE,
   COMMENT
 }
-
+//this editor only update/create body
 class Editor extends StatefulWidget{
   final FINISH_METHOD method;
   final String url;
