@@ -3,7 +3,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const DONE_LOGIN = 'Done_Login';
-const GOGS_HOST = 'GOGS_Host';
+const GITEA_HOST = 'GITEA_Host';
 const USERNAME = 'UserName';
 const PASSWORD = 'Password';
 const TOKEN = 'Token';
@@ -16,7 +16,7 @@ final SecureConfigReader config = new SecureConfigReader();
 class SecureConfigReader{
   String userToken;
   String userName;
-  String gogsHost;
+  String giteaHost;
   String avatar;
 
   final FlutterSecureStorage config = new FlutterSecureStorage();
@@ -46,11 +46,11 @@ class SecureConfigReader{
   Future<bool> setLoginToken() async{
     var result = false;
     var _config = await config.readAll();
-    if(_config[GOGS_HOST] != null && _config[GOGS_HOST].length>0
+    if(_config[GITEA_HOST] != null && _config[GITEA_HOST].length>0
       && _config[USERNAME] != null && _config[USERNAME].length>0
       && _config[TOKEN] != null && _config[TOKEN].length>0)
       {
-        gogsHost = _config[GOGS_HOST];
+        giteaHost = _config[GITEA_HOST];
         userName = _config[USERNAME];
         userToken = _config[TOKEN];
         // avatar = _config[AVATAR];

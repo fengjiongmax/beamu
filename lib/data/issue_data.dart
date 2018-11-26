@@ -8,7 +8,7 @@ import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 
 Future<List<IssueModel>> getRepoIssues(RepositoryModel repo,{bool closed = false}) async{
-  var _url = config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues'+(closed?'?state=closed':'');
+  var _url = config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues'+(closed?'?state=closed':'');
 
   var _response = await httpGet(_url);
   if(_response.statusCode == 404) return new List<IssueModel>();
@@ -19,7 +19,7 @@ Future<List<IssueModel>> getRepoIssues(RepositoryModel repo,{bool closed = false
 }
 
 Future<List<IssueCommentModel>> getIssueComments(RepositoryModel repo,int number) async{
-  var _url = config.gogsHost +'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+number.toString()+'/comments';
+  var _url = config.giteaHost +'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+number.toString()+'/comments';
 
   var _response = await httpGet(_url);
   if(_response.statusCode == 404) return new List<IssueCommentModel>();
@@ -30,7 +30,7 @@ Future<List<IssueCommentModel>> getIssueComments(RepositoryModel repo,int number
 }
 
 Future<IssueModel> updateIssue(RepositoryModel repo,IssueModel issue) async{
-  var _url = config.gogsHost +'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString();
+  var _url = config.giteaHost +'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString();
   var _response = await httpPatch(_url, SubmitIssueModel.fromIssue(issue).toJsonString());
 
   final _parsed = json.decode(_response.body);

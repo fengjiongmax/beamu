@@ -7,7 +7,7 @@ import 'package:beamu/share/requests.dart';
 import 'package:beamu/share/configs.dart';
 
 Future<UserModel> getUser(String userName) async{
-  final url = config.gogsHost+'/api/v1/users/'+userName;
+  final url = config.giteaHost+'/api/v1/users/'+userName;
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body);
@@ -16,7 +16,7 @@ Future<UserModel> getUser(String userName) async{
 }
 
 Future<List<UserModel>> getRepoCollaborators(RepositoryModel repo) async{
-  final url = config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/collaborators';
+  final url = config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/collaborators';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();

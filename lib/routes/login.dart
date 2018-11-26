@@ -11,7 +11,7 @@ class Login extends StatefulWidget{
 class _LoginState extends State<Login>{
   final _userNameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _gogsHostController = TextEditingController();
+  final _giteaHostController = TextEditingController();
 
   var _buttonPressed = false;
 
@@ -31,14 +31,14 @@ class _LoginState extends State<Login>{
                 ),
                 SizedBox(height: 12.0),
                 TextField(
-                  controller: _gogsHostController,
+                  controller: _giteaHostController,
                   decoration: InputDecoration(
                     filled: true,
                     labelText: 'Your Gogs instance',
                     suffixIcon: IconButton(
                       icon: Icon(Icons.clear),
                       onPressed: (){
-                        _gogsHostController.clear();
+                        _giteaHostController.clear();
                       },
                     )
                   ),
@@ -68,7 +68,7 @@ class _LoginState extends State<Login>{
                       setState(() {
                         _buttonPressed=true;
                       });
-                      loginAction(_userNameController.text, _passwordController.text, _gogsHostController.text).then((v){
+                      loginAction(_userNameController.text, _passwordController.text, _giteaHostController.text).then((v){
                         if(v == LOGIN_STAT.success){
                           Navigator.of(context).pop();
                           Navigator.push(context, MaterialPageRoute(builder: (context) => RepositoriesList()));

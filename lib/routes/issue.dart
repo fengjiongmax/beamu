@@ -58,7 +58,7 @@ class IssuesState extends State<Issues>{
                     icon: Icon(Icons.edit),
                     onPressed: (){
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString()
+                        MaterialPageRoute(builder: (context)=>Editor(url: config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString()
                                                                     ,method:FINISH_METHOD.PATCH
                                                                     ,issue: issue
                                                                     ,body: BODY.ISSUE,))
@@ -130,7 +130,7 @@ class IssuesState extends State<Issues>{
                     //     icon: Icon(Icons.edit),
                     //     onPressed: (){
                     //       Navigator.of(context).push(
-                    //         MaterialPageRoute(builder: (context)=>Editor(url: config.gogsHost+'/api/v1/repos/'
+                    //         MaterialPageRoute(builder: (context)=>Editor(url: config.giteaHost+'/api/v1/repos/'
                     //                                                                          +repo.owner.username+'/issues/comments/'
                     //                                                                          +comment.id.toString()
                     //                                                     ,method:FINISH_METHOD.PATCH
@@ -286,7 +286,7 @@ class IssuesState extends State<Issues>{
           onPressed: () async{
             var result = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
-                builder: (context)=> Editor(url: config.gogsHost+'/api/v1/repos/'
+                builder: (context)=> Editor(url: config.giteaHost+'/api/v1/repos/'
                                                                 +repo.owner.username+'/'
                                                                 +repo.name+'/issues/'
                                                                 +_renderIssue.number.toString()+'/comments'

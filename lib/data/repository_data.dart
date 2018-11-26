@@ -6,7 +6,7 @@ import 'package:beamu/share/requests.dart';
 import 'package:beamu/share/configs.dart';
 
 Future<List<RepositoryModel>> getSelfRepositories() async{
-  final url = config.gogsHost+'/api/v1/user/repos';
+  final url = config.giteaHost+'/api/v1/user/repos';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
@@ -15,7 +15,7 @@ Future<List<RepositoryModel>> getSelfRepositories() async{
 }
 
 Future<List<RepositoryModel>> getRepositories(String userName) async{
-  final url = config.gogsHost+'/api/v1/users/'+userName+'/repos';
+  final url = config.giteaHost+'/api/v1/users/'+userName+'/repos';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
@@ -24,7 +24,7 @@ Future<List<RepositoryModel>> getRepositories(String userName) async{
 }
 
 Future<String> getREADME(RepositoryModel repo) async{
-  final url = config.gogsHost+"/api/v1/repos/"
+  final url = config.giteaHost+"/api/v1/repos/"
                             +repo.owner.username+"/"
                             +repo.name+"/raw/master/README.md";
   final response = await httpGet(url);

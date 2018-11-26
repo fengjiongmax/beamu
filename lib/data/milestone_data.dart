@@ -7,7 +7,7 @@ import 'package:beamu/share/requests.dart';
 import 'package:beamu/share/configs.dart';
 
 Future<List<MilestoneModel>> getRepoMilestones(RepositoryModel repo) async{
-  final url = config.gogsHost + '/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/milestones';
+  final url = config.giteaHost + '/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/milestones';
 
   final response = await httpGet(url);
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();

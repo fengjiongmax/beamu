@@ -7,7 +7,7 @@ import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/requests.dart';
 
 Future<List<LabelModel>> getRepoLabels(RepositoryModel repo) async{
-  final url = config.gogsHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/labels';
+  final url = config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/labels';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();

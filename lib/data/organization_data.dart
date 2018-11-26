@@ -7,7 +7,7 @@ import 'package:beamu/share/configs.dart';
 
 
 Future<List<OrganizationModel>> getSelfOrganizations() async{
-  final url = config.gogsHost+'/api/v1/user/orgs';
+  final url = config.giteaHost+'/api/v1/user/orgs';
 
   final response = await httpGet(url);
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
@@ -17,7 +17,7 @@ Future<List<OrganizationModel>> getSelfOrganizations() async{
 }
 
 Future<List<OrganizationModel>> getUserOrganizations(String userName) async{
-  final url = config.gogsHost+'/api/v1/users/'+userName+'/orgs';
+  final url = config.giteaHost+'/api/v1/users/'+userName+'/orgs';
 
   final response = await httpGet(url);
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();

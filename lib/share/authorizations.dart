@@ -11,12 +11,12 @@ import 'package:beamu/share/requests.dart';
 
 enum LOGIN_STAT{ failed,success,invalid_host,timeout}
 
-Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) async{
-  while(gogsHost.substring(gogsHost.length-1,gogsHost.length) == '/'){
-    gogsHost = gogsHost.substring(0,gogsHost.length-1);//remove the last '/'
+Future<LOGIN_STAT> loginAction(String username,String password,String giteaHost) async{
+  while(giteaHost.substring(giteaHost.length-1,giteaHost.length) == '/'){
+    giteaHost = giteaHost.substring(0,giteaHost.length-1);//remove the last '/'
   }
   var retVal = LOGIN_STAT.failed;
-  var loginUrl = gogsHost+"/api/v1/users/"+username+"/tokens";
+  var loginUrl = giteaHost+"/api/v1/users/"+username+"/tokens";
   var loginCredential = username+":"+password;
   Map<String,String> header = new Map<String,String>();
   const base64 = Base64Codec();
@@ -49,7 +49,7 @@ Future<LOGIN_STAT> loginAction(String username,String password,String gogsHost) 
           retVal = LOGIN_STAT.success;
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setBool(DONE_LOGIN, true);
-          await config.saveValue(GOGS_HOST, gogsHost);
+          await config.saveValue(GITEA_HOST, giteaHost);
           await config.saveValue(USERNAME, username);
           await config.saveValue(PASSWORD, password);
 
