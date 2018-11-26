@@ -122,8 +122,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                                           )
                                         );
                     if(_issuesUpdated != null && _issuesUpdated){
-                    var _newIssues = await getRepoIssues(repo);
-                    if(this.mounted){
+                      var _newIssues = await getRepoIssues(repo);
+                      if(this.mounted){
                         setState((){
                           _issues.clear();
                           _issues.addAll(_newIssues);

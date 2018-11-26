@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'user_model.dart';
 import 'label_model.dart';
 import 'milestone_model.dart';
@@ -102,12 +104,17 @@ class SubmitIssueModel{
   }
 
   Map<String,dynamic> toJson()=>{
-    'assignee':assignee,
-    'assignees': assignees,
+    'assignee':assignee.username,
+    'assignees': assignees.map((v){return v.username;}).toList(),
     'body':  body,
     // dueDate: issue.
     'milestone': milestone,
     'state': state,
     'title': title
   };
+
+  String toJsonString() {
+    var a = this.toJson();
+    return json.encode(this.toJson());
+  }
 }

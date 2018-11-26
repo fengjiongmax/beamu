@@ -31,9 +31,9 @@ Future<List<IssueCommentModel>> getIssueComments(RepositoryModel repo,int number
 
 Future<IssueModel> updateIssue(RepositoryModel repo,IssueModel issue) async{
   var _url = config.gogsHost +'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString();
-  var _response = await httpPatch(_url, SubmitIssueModel.fromIssue(issue).toJson());
+  var _response = await httpPatch(_url, SubmitIssueModel.fromIssue(issue).toJsonString());
 
   final _parsed = json.decode(_response.body);
-  IssueModel returnIssue = _parsed.map<IssueModel>((json) => IssueModel.fromJson(json));
+  IssueModel returnIssue = IssueModel.fromJson(_parsed);
   return returnIssue;
 }

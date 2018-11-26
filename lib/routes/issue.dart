@@ -29,8 +29,9 @@ class Issues extends StatefulWidget{
 class IssuesState extends State<Issues>{
   final RepositoryModel repo;
   final IssueModel issue;
-  TextEditingController _titleEditController;
 
+  IssueModel _renderIssue;
+  TextEditingController _titleEditController;
   var _comments = new List<IssueCommentModel>();
   bool _commentsLoading = true;
   bool _issueUpdated = false;
@@ -188,13 +189,14 @@ class IssuesState extends State<Issues>{
 
   @override
   void initState(){
+    _issueUpdated=false;
     super.initState();
+    _renderIssue = issue;
     getIssueComments(repo, issue.number).then((v){
       if(_commentsLoading && this.mounted){
          setState(() {
           _comments.addAll(v);
           _commentsLoading = false;
-          _issueUpdated = true;
         });
       }
     });
@@ -210,11 +212,19 @@ class IssuesState extends State<Issues>{
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.save),
-          onPressed: (){
-            //TODO:edit issue title
-            // var _toSubmitIssue = issue;
-            // issue.title = _titleEditController.text;
-            
+          onPressed: () async{
+            // TODO:edit issue title
+            issue.title = _titleEditController.text;
+            var updated = await updateIssue(repo, issue);
+            if(updated != null){
+              setState(() {
+                _renderIssue=updated;
+                _issueUpdated = true;
+              });
+            }
+            setState(() {
+              _editTitle=false;
+            });
           },
         )
       ],
@@ -228,7 +238,7 @@ class IssuesState extends State<Issues>{
       onWillPop: _onWillPop,
       child: Scaffold(
         drawer: BeamuDrawer(),
-        appBar: AppBar(
+        appBar: _editTitle?_editIssueTitle(): AppBar(
           automaticallyImplyLeading: false,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -237,9 +247,9 @@ class IssuesState extends State<Issues>{
             },
           ),
           title: Text(
-            issue.title
+            _renderIssue.title
           ),
-          actions: repo.owner.username == config.userName && issue.user.username == config.userName ?
+          actions: repo.owner.username == config.userName && _renderIssue.user.username == config.userName ?
             <Widget>[            
               PopupMenuButton(
                 onSelected: (PopChoice v){
@@ -279,13 +289,13 @@ class IssuesState extends State<Issues>{
                 builder: (context)=> Editor(url: config.gogsHost+'/api/v1/repos/'
                                                                 +repo.owner.username+'/'
                                                                 +repo.name+'/issues/'
-                                                                +issue.number.toString()+'/comments'
+                                                                +_renderIssue.number.toString()+'/comments'
                                             ,body: BODY.COMMENT
                                             ,method: FINISH_METHOD.POST,))
             );
             if(result && this.mounted){
               _issueUpdated = true;
-              var _retList = await getIssueComments(repo, issue.number);
+              var _retList = await getIssueComments(repo, _renderIssue.number);
               setState(() {
                 _comments.clear();
                 _comments.addAll(_retList);

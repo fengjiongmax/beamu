@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class UserModel{
   UserModel({
     this.id,
@@ -19,10 +21,24 @@ class UserModel{
     return UserModel(
       id: json['id'],
       username: json['username'],
-      fullName: json['fullname'],
+      fullName: json['full_name'],
       email: json['email'],
       avatarUrl: json['avatar_url'],
       login: json['login']
     );
   }
+
+  Map<String,dynamic> toJson() =>{
+    'id':id,
+    'username':username,
+    'full_name':fullName,
+    'email':email,
+    'avatar_url':avatarUrl,
+    'login':login
+  };
+
+  String toJsonString(){
+    return json.encode(this.toJson());
+  }
+
 }
