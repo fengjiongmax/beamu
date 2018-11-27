@@ -104,8 +104,8 @@ class SubmitIssueModel{
   }
 
   Map<String,dynamic> toJson()=>{
-    'assignee':assignee.username,
-    'assignees': assignees.map((v){return v.username;}).toList(),
+    'assignee':assignee==null?null: assignee.username,
+    'assignees': assignees==null?null:assignees.map((v){return v.username;}).toList(),
     'body':  body,
     // dueDate: issue.
     'milestone': milestone,
@@ -114,7 +114,6 @@ class SubmitIssueModel{
   };
 
   String toJsonString() {
-    var a = this.toJson();
     return json.encode(this.toJson());
   }
 }

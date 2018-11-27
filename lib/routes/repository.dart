@@ -49,6 +49,48 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   RepositoryState({@required this.repo}):super();
 
+  @override
+  void initState(){
+    super.initState();
+    _tabController = TabController(vsync: this,length: tabContents.length);
+    getRepoIssues(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _issues.addAll(v);
+        });
+      }
+    });
+    getREADME(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _readme = v;
+          _readmeLoading = false;
+        });
+      }
+    });
+    getRepoMilestones(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _milestones.addAll(v);
+        });
+      }
+    });
+    getRepoCollaborators(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _collaborators.addAll(v);
+        });
+      }
+    });
+    getRepoLabels(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _labels.addAll(v);
+        });
+      }
+    });
+  }
+
   Widget _buildUrlList(BuildContext curContext){
 
     List<UrlContain> urlList = [
@@ -117,18 +159,16 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                     ),
                   ),
                   onTap: () async{
-                    var _issuesUpdated = await Navigator.of(context).push<bool>(MaterialPageRoute(
+                    //TODO:update depend on if issue's updated.
+                    await Navigator.of(context).push<bool>(MaterialPageRoute(
                                             builder: (context)=>Issues(repo: repo,issue: issue)
                                           )
                                         );
-                    if(_issuesUpdated != null && _issuesUpdated){
-                      var _newIssues = await getRepoIssues(repo);
-                      if(this.mounted){
-                        setState((){
-                          _issues.clear();
-                          _issues.addAll(_newIssues);
-                        });
-                      }
+                    var _newIssues = await getRepoIssues(repo);
+                    if(this.mounted){
+                      setState((){
+                        _issues = _newIssues;
+                      });
                     }
                   },
                 ),
@@ -288,48 +328,6 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
         return _buildUserCard(u);
       }),
     );
-  }
-
-  @override
-  void initState(){
-    super.initState();
-    _tabController = TabController(vsync: this,length: tabContents.length);
-    getRepoIssues(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _issues.addAll(v);
-        });
-      }
-    });
-    getREADME(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _readme = v;
-          _readmeLoading = false;
-        });
-      }
-    });
-    getRepoMilestones(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _milestones.addAll(v);
-        });
-      }
-    });
-    getRepoCollaborators(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _collaborators.addAll(v);
-        });
-      }
-    });
-    getRepoLabels(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _labels.addAll(v);
-        });
-      }
-    });
   }
 
   @override

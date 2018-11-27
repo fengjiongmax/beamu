@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:beamu/components/drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -32,6 +34,7 @@ class IssuesState extends State<Issues>{
 
   IssueModel _renderIssue;
   TextEditingController _titleEditController;
+  FocusNode _focusNode = new FocusNode();
   var _comments = new List<IssueCommentModel>();
   bool _commentsLoading = true;
   bool _issueUpdated = false;
@@ -183,24 +186,58 @@ class IssuesState extends State<Issues>{
     );
   }
   
-  Future<bool> _onWillPop() async{
-    return _issueUpdated;
-  }
-
   @override
   void initState(){
     _issueUpdated=false;
-    super.initState();
     _renderIssue = issue;
-    getIssueComments(repo, issue.number).then((v){
-      if(_commentsLoading && this.mounted){
-         setState(() {
+    if(_commentsLoading && this.mounted){
+      getIssueComments(repo, _renderIssue.number).then((v){
+          setState(() {
           _comments.addAll(v);
           _commentsLoading = false;
         });
-      }
-    });
+      });
+    }
     _titleEditController = new TextEditingController(text: issue.title);
+    super.initState();
+  }
+
+  Future<bool> _onWillPop(){
+    if(_focusNode.hasFocus){
+      if(_titleEditController.text == issue.title){
+        _focusNode.unfocus();
+      } else {
+        showDialog(
+          context: context,
+          builder: (context)=> AlertDialog(
+            title: Text('Save changes?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Yes'),
+                onPressed: ()=>_saveTitle()
+              ),
+              FlatButton(
+                child: Text('No'),
+                onPressed: (){
+                  _focusNode.unfocus();
+                },
+              )
+            ],
+          )
+        );
+      }
+      setState(() {
+        _editTitle=false;
+      });
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
+  @override
+  void dispose(){
+    _focusNode.dispose();
+    super.dispose();
   }
 
   PreferredSizeWidget _editIssueTitle(){
@@ -208,28 +245,34 @@ class IssuesState extends State<Issues>{
       automaticallyImplyLeading: false,
       title: TextField(
         controller: _titleEditController,
+        focusNode: _focusNode,
       ),
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.save),
-          onPressed: () async{
-            // TODO:edit issue title
-            issue.title = _titleEditController.text;
-            var updated = await updateIssue(repo, issue);
-            if(updated != null){
-              setState(() {
-                _renderIssue=updated;
-                _issueUpdated = true;
-              });
-            }
-            setState(() {
-              _editTitle=false;
-            });
-          },
+          onPressed: () =>_saveTitle()
         )
       ],
     );
   } 
+
+  Future<void> _saveTitle() async{
+    _focusNode.unfocus();
+    issue.title = _titleEditController.text;
+    var updated = await updateIssue(repo, issue);
+    if(updated != null){
+      setState(() {
+        // issue.title = _titleEditController.text;
+        issue.comments+=1;
+        _renderIssue=updated;
+        _issueUpdated = true;
+      });
+    }
+    setState(() {
+      _editTitle=false;
+    });
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -257,8 +300,8 @@ class IssuesState extends State<Issues>{
                     case 'Edit Title':
                       setState(() {
                         _editTitle=true;
+                        FocusScope.of(context).requestFocus(_focusNode);
                       });
-                      print("editing!");
                       break;
                   }
                 },
@@ -284,7 +327,7 @@ class IssuesState extends State<Issues>{
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add_comment),
           onPressed: () async{
-            var result = await Navigator.of(context).push<bool>(
+            await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                 builder: (context)=> Editor(url: config.giteaHost+'/api/v1/repos/'
                                                                 +repo.owner.username+'/'
@@ -293,9 +336,8 @@ class IssuesState extends State<Issues>{
                                             ,body: BODY.COMMENT
                                             ,method: FINISH_METHOD.POST,))
             );
-            if(result && this.mounted){
-              _issueUpdated = true;
-              var _retList = await getIssueComments(repo, _renderIssue.number);
+            var _retList = await getIssueComments(repo, _renderIssue.number);
+            if(this.mounted){
               setState(() {
                 _comments.clear();
                 _comments.addAll(_retList);

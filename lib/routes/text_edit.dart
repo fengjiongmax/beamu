@@ -44,6 +44,27 @@ class EditorState extends State<Editor>{
   String content;
   TextEditingController _controller ;
   bool _hintTextChanged = false;
+  FocusNode _focusNode;
+
+  @override
+  void initState(){
+    super.initState();
+    if(body == BODY.ISSUE){
+      _controller = new TextEditingController(text: issue==null?'':issue.body);
+    }
+    else if(body == BODY.COMMENT){
+      _controller = new TextEditingController(text: comment==null?'':comment.body);
+    }
+    setState(() {
+      content=_controller.text;
+    });
+  }
+
+  @override
+  void dispose(){
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   Future<bool> _saveValue() async{
     bool _retVal = false;
@@ -92,20 +113,6 @@ class EditorState extends State<Editor>{
   }
 
   @override
-  void initState(){
-    super.initState();
-    if(body == BODY.ISSUE){
-      _controller = new TextEditingController(text: issue==null?'':issue.body);
-    }
-    else if(body == BODY.COMMENT){
-      _controller = new TextEditingController(text: comment==null?'':comment.body);
-    }
-    setState(() {
-      content=_controller.text;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) =>
@@ -131,6 +138,8 @@ class EditorState extends State<Editor>{
                 child: SingleChildScrollView(
                   child: TextField(
                     controller: _controller,
+                    focusNode: _focusNode,
+                    autofocus: true,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     onChanged: (v){
