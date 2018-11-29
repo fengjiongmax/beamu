@@ -23,10 +23,10 @@ Future<List<RepositoryModel>> getRepositories(String userName) async{
   return repos;
 }
 
-Future<String> getREADME(RepositoryModel repo) async{
+Future<String> getDefaultREADME(RepositoryModel repo) async{
   final url = config.giteaHost+"/api/v1/repos/"
                             +repo.owner.username+"/"
-                            +repo.name+"/raw/master/README.md";
+                            +repo.name+"/raw/"+repo.defaultBranch+"/README.md";
   final response = await httpGet(url);
 
   return response.statusCode == 200? response.body : null;
