@@ -20,8 +20,9 @@ class IssueModel{
     this.state,
     this.comments,
     this.createAt,
-    this.updateAt
-    //@required this.PullRequest
+    this.updateAt,
+    this.dueDate,
+    //this.PullRequest
   });
 
   int id;
@@ -38,9 +39,10 @@ class IssueModel{
   int comments;
   DateTime createAt;
   DateTime updateAt;
+  DateTime dueDate;
 
   //pull requests are not inplemented in gogs api v1 yet
-  //final PullRequesModel pullRequest;
+  //PullRequesModel pullRequest;
 
   factory IssueModel.fromJson(Map<String,dynamic> json){
     List<LabelModel> labels;
@@ -72,8 +74,9 @@ class IssueModel{
       assignees: assignees,
       state: json['state'],
       comments: json['comments'],
-      createAt: DateTime.parse(json['created_at']),
-      updateAt: DateTime.parse(json['updated_at']),
+      createAt: json['created_at']==null?null: DateTime.parse(json['created_at']),
+      updateAt: json['updated_at']==null?null: DateTime.parse(json['updated_at']),
+      dueDate: json['due_date']==null?null: DateTime.parse(json['due_date'])
       //pullRequest: PullRequest.fromJson(json['pull_request'])
     );
   }
