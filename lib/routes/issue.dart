@@ -290,6 +290,7 @@ class IssuesState extends State<Issues>{
             },
           ),
           title: Text(
+            //TODO: display title with multiple line
             _renderIssue.title
           ),
           actions: repo.owner.username == config.userName && _renderIssue.user.username == config.userName ?

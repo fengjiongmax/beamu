@@ -23,6 +23,33 @@ import 'package:beamu/components/drawer.dart';
 import 'package:beamu/share/time_since.dart';
 import 'package:beamu/routes/issue.dart';
 
+class UrlContain{
+  final String title;
+  final String url;
+
+  const UrlContain({this.title,this.url});
+}
+
+class Choice{
+  const Choice({
+    this.title
+    ,this.showFab
+    // ,this.fabIcon
+  });
+
+  final String title;
+  final bool showFab;
+  // final IconData fabIcon;
+}
+
+const List<Choice> tabContents = const <Choice>[
+  const Choice(title: 'README' ,showFab: false),
+  const Choice(title: 'ISSUES' ,showFab: true),
+  const Choice(title: 'MILESTONES',showFab: true),
+  const Choice(title: 'COLLABORATORS',showFab: true),
+  const Choice(title: 'LABELS',showFab: true),
+  const Choice(title: 'URLS',showFab: false)
+];
 
 class Repository extends StatefulWidget{
   final RepositoryModel repo;
@@ -45,7 +72,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   TabController _tabController;
 
-  var _readmeLoading = true;
+  bool _readmeLoading = true;
+  bool _showFAB = false;
 
   RepositoryState({@required this.repo}):super();
 
@@ -53,6 +81,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   void initState(){
     super.initState();
     _tabController = TabController(vsync: this,length: tabContents.length);
+    _tabController.addListener(_tabChange);
     getRepoIssues(repo).then((v){
       if(this.mounted){
         setState(() {
@@ -60,7 +89,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
         });
       }
     });
-    getREADME(repo).then((v){
+    getDefaultREADME(repo).then((v){
       if(this.mounted){
         setState(() {
           _readme = v;
@@ -88,6 +117,78 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
           _labels.addAll(v);
         });
       }
+    });
+  }
+
+  @override
+  void dispose(){
+    _tabController.removeListener(_tabChange);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: _showFAB?FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _onPlusPressed,
+      ):null,
+      drawer: BeamuDrawer(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        title: Container(
+          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Column(
+            children: <Widget>[
+              Text(repo.owner.username+"/"+repo.name),
+              Text(timeSince(repo.updatedAt))
+            ],
+          ),
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabs: tabContents.map((tab){
+            return Tab(
+              text:tab.title
+            );
+          }).toList()
+        ),
+      ),
+      body:  Builder(
+        builder: (context)=>TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: _readmeLoading?LoadingContent(): _readme==null?CenterText(centerText: 'README.md not found',) : MarkdownRender(data:_readme,),
+            ),
+            _buildIssueList(),
+            _buildMilestones(),
+            _buildCollaborators(),
+            _buildLabels(),
+            _buildUrlList(context),
+          ],
+        ),
+      )
+    );
+  }
+
+  void _onPlusPressed(){
+    //TODO:handle plus button press.
+  }
+
+  void _tabChange(){
+    setState(() {
+      _showFAB=tabContents[_tabController.index].showFab && (repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES');
+      // _fabChild=_showFAB?tabContents[_tabController.index].fabIcon:null;
     });
   }
 
@@ -330,79 +431,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: BeamuDrawer(),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: (){
-            Navigator.pop(context);
-          },
-        ),
-        title: Container(
-          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: Column(
-            children: <Widget>[
-              Text(repo.owner.username+"/"+repo.name),
-              Text(timeSince(repo.updatedAt))
-            ],
-          ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: tabContents.map((tab){
-            return Tab(
-              text:tab.title
-            );
-          }).toList()
-        ),
-      ),
-      body:  Builder(
-        builder: (context)=>TabBarView(
-          controller: _tabController,
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: _readmeLoading?LoadingContent(): _readme==null?CenterText(centerText: 'README.md not found',) : MarkdownRender(data:_readme,),
-            ),
-            _buildIssueList(),
-            _buildMilestones(),
-            _buildCollaborators(),
-            _buildLabels(),
-            _buildUrlList(context),
-          ],
-        ),
-      )
-    );
-  }
 }
-
-class UrlContain{
-  final String title;
-  final String url;
-
-  const UrlContain({this.title,this.url});
-}
-
-class Choice{
-  const Choice({this.title});
-
-  final String title;
-}
-
-const List<Choice> tabContents = const <Choice>[
-  const Choice(title: 'README'),
-  const Choice(title: 'ISSUES'),
-  const Choice(title: 'MILESTONES'),
-  const Choice(title: 'COLLABORATORS'),
-  const Choice(title: 'LABELS'),
-  const Choice(title: 'URLS')
-];
-
 
 
 
