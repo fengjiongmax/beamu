@@ -82,42 +82,12 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     super.initState();
     _tabController = TabController(vsync: this,length: tabContents.length);
     _tabController.addListener(_tabChange);
-    getRepoIssues(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _issues.addAll(v);
-        });
-      }
-    });
-    getDefaultREADME(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _readme = v;
-          _readmeLoading = false;
-        });
-      }
-    });
-    getRepoMilestones(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _milestones.addAll(v);
-        });
-      }
-    });
-    getRepoCollaborators(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _collaborators.addAll(v);
-        });
-      }
-    });
-    getRepoLabels(repo).then((v){
-      if(this.mounted){
-        setState(() {
-          _labels.addAll(v);
-        });
-      }
-    });
+
+    _getREADME();
+    _getIssues();
+    _getLables();
+    _getMilestones();
+    _getCollaborators();
   }
 
   @override
@@ -265,12 +235,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                                             builder: (context)=>Issues(repo: repo,issue: issue)
                                           )
                                         );
-                    var _newIssues = await getRepoIssues(repo);
-                    if(this.mounted){
-                      setState((){
-                        _issues = _newIssues;
-                      });
-                    }
+                    _getIssues();
                   },
                 ),
                 issue.labels != null?Container(
@@ -431,6 +396,56 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     );
   }
 
+  void _getREADME(){
+    getDefaultREADME(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _readme = v;
+          _readmeLoading = false;
+        });
+      }
+    });
+  }
+
+  void _getIssues(){
+    getRepoIssues(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _issues.addAll(v);
+        });
+      }
+    });
+  }
+
+  void _getLables(){
+    getRepoLabels(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _labels.addAll(v);
+        });
+      }
+    });
+  }
+
+  void _getMilestones(){
+    getRepoMilestones(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _milestones.addAll(v);
+        });
+      }
+    });
+  }
+
+  void _getCollaborators(){
+    getRepoCollaborators(repo).then((v){
+      if(this.mounted){
+        setState(() {
+          _collaborators.addAll(v);
+        });
+      }
+    });
+  }
 }
 
 
