@@ -7,7 +7,32 @@ import 'package:beamu/routes/login.dart';
 import 'package:beamu/routes/organization_list.dart';
 import 'package:beamu/routes/repositories_list.dart';
 
-class BeamuDrawer extends StatelessWidget{
+class BeamuDrawer extends StatefulWidget{
+  @override
+  _BeamuDrawerState createState() => _BeamuDrawerState();
+}
+
+class _BeamuDrawerState extends State<BeamuDrawer>{
+  bool _avatarSet = false;
+
+  @override
+  void initState(){
+    if(config.avatar == null){
+      getUserInfo().then((v){
+        config.setUserAvatar(v.avatarUrl);
+        if(this.mounted){
+          setState(() {
+                    _avatarSet = true;
+          });
+        }
+      });
+    }
+    setState(() {
+      _avatarSet = config.avatar != null;
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -18,7 +43,7 @@ class BeamuDrawer extends StatelessWidget{
               children: <Widget>[
                 SizedBox(height: 80,),
                 ListTile(
-                  leading: Image.network(config.avatar,height: 50,width: 50,fit: BoxFit.scaleDown,),
+                  leading: _avatarSet?Image.network(config.avatar,height: 50,width: 50,fit: BoxFit.scaleDown,):Icon(Icons.account_circle),
                   title: Text(config.userName),
                 )
               ],
@@ -77,5 +102,4 @@ class BeamuDrawer extends StatelessWidget{
       ),
     );
   }
-  
 }

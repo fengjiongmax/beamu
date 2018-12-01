@@ -14,6 +14,8 @@ const APP_NAME='BEAMU';
 final SecureConfigReader config = new SecureConfigReader();
 
 class SecureConfigReader{
+  bool isFetchingUserInfo = false;
+
   String userToken;
   String userName;
   String giteaHost;
@@ -60,11 +62,15 @@ class SecureConfigReader{
     return result;
   }
 
-  void setUserAvatar(String avatarUrl) async{
+  void setUserAvatar(String avatarUrl){
     this.avatar = avatarUrl;
   }
 
-
+  Future<void> untilUserAvatarSet() async{
+    while(avatar == null){
+    }
+    return null;
+  }
 }
 
 

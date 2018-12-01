@@ -64,8 +64,8 @@ class Repository extends StatefulWidget{
 class RepositoryState extends State<Repository> with SingleTickerProviderStateMixin {
   final RepositoryModel repo;
 
-  List<MilestoneModel> _milestones = new List<MilestoneModel>();
-  List<IssueModel> _issues = new List<IssueModel>();
+  List<MilestoneModel> _milestones;
+  List<IssueModel> _issues;
   String _readme;
   List<UserModel> _collaborators = new List<UserModel>();
   List<LabelModel> _labels = new List<LabelModel>();
@@ -152,7 +152,19 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _onPlusPressed(){
+    // switch(_tabController.index){
+    //   case 0:
+    //     print("0");
+    //     break;
+    //   case 1:
+    //     print("1");
+    //     break;
+    //   case 2:
+    //     print("2");
+    //     break;
+    // }
     //TODO:handle plus button press.
+    print(_tabController.index.toString());
   }
 
   void _tabChange(){
@@ -411,7 +423,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoIssues(repo).then((v){
       if(this.mounted){
         setState(() {
-          _issues.addAll(v);
+          _issues = v;
         });
       }
     });
@@ -421,7 +433,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoLabels(repo).then((v){
       if(this.mounted){
         setState(() {
-          _labels.addAll(v);
+          _labels=v;
         });
       }
     });
@@ -431,7 +443,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoMilestones(repo).then((v){
       if(this.mounted){
         setState(() {
-          _milestones.addAll(v);
+          _milestones=v;
         });
       }
     });
@@ -441,7 +453,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoCollaborators(repo).then((v){
       if(this.mounted){
         setState(() {
-          _collaborators.addAll(v);
+          _collaborators=v;
         });
       }
     });
