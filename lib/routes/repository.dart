@@ -21,7 +21,9 @@ import 'package:beamu/components/loading.dart';
 import 'package:beamu/components/drawer.dart';
 
 import 'package:beamu/share/time_since.dart';
+
 import 'package:beamu/routes/issue.dart';
+import 'package:beamu/routes/create/issue_create.dart';
 
 class UrlContain{
   final String title;
@@ -151,18 +153,21 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     );
   }
 
-  void _onPlusPressed(){
-    // switch(_tabController.index){
-    //   case 0:
-    //     print("0");
-    //     break;
-    //   case 1:
-    //     print("1");
-    //     break;
-    //   case 2:
-    //     print("2");
-    //     break;
-    // }
+  void _onPlusPressed() async{
+    switch(_tabController.index){
+      case 0:
+        print("0");
+        break;
+      case 1:
+        await Navigator.push(context, MaterialPageRoute(
+          builder: (context) => IssueCreator()
+        ));
+        print("1");
+        break;
+      case 2:
+        print("2");
+        break;
+    }
     //TODO:handle plus button press.
     print(_tabController.index.toString());
   }

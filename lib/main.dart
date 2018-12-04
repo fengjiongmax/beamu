@@ -28,7 +28,6 @@ class MyHomePage extends StatefulWidget{
 }
 
 class MyHomePageState extends State<MyHomePage>{
-//TODO:use router to navigate instead of use widgets directly
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -41,7 +40,11 @@ class MyHomePageState extends State<MyHomePage>{
             return Login();
           }
         }
-        return LoadingContent();
+        return Scaffold(
+          body: Center(
+            child: LoadingContent(),
+          ),
+        );
       },
     );
   }

@@ -48,6 +48,7 @@ class EditorState extends State<Editor>{
 
   @override
   void initState(){
+    _focusNode = new FocusNode();
     super.initState();
     if(body == BODY.ISSUE){
       _controller = new TextEditingController(text: issue==null?'':issue.body);

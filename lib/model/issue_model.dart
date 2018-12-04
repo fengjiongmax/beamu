@@ -99,7 +99,7 @@ class SubmitIssueModel{
       assignee:issue.assignee,
       assignees: issue.assignees,
       body:  issue.body,
-      // dueDate: issue.
+      dueDate: issue.dueDate,
       milestone: issue.milestone,
       state: issue.state,
       title: issue.title
@@ -110,7 +110,7 @@ class SubmitIssueModel{
     'assignee':assignee==null?null: assignee.username,
     'assignees': assignees==null?null:assignees.map((v){return v.username;}).toList(),
     'body':  body,
-    // dueDate: issue.
+    'due_date': dueDate==null?null:dueDate.toUtc(),
     'milestone': milestone,
     'state': state,
     'title': title
