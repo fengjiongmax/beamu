@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:beamu/components/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:beamu/routes/text_edit.dart';
 
@@ -9,13 +9,21 @@ import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 import 'package:beamu/model/repository_model.dart';
 
+import 'package:beamu/model/app/tab_choice.dart';
+
 import 'package:beamu/data/issue_data.dart';
 
 import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/loading.dart';
+import 'package:beamu/components/drawer.dart';
 
 import 'package:beamu/share/time_since.dart';
 import 'package:beamu/share/configs.dart';
+
+const List<Choice> tabContents= const<Choice>[
+  const Choice(title: 'DISCUSSIONS',showFab: true),
+  const Choice(title: 'PROPERTIES',showFab: false)
+];
 
 class Issues extends StatefulWidget{
   final RepositoryModel repo;
@@ -27,8 +35,7 @@ class Issues extends StatefulWidget{
   IssuesState createState() => new IssuesState(repo: repo,issue: issue);
 }
 
-//TODO:use tabview to render issue:issue/comments,labels,milestone,assignees,participants
-class IssuesState extends State<Issues>{
+class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   final RepositoryModel repo;
   final IssueModel issue;
 
@@ -37,12 +44,15 @@ class IssuesState extends State<Issues>{
   FocusNode _focusNode = new FocusNode();
   var _comments = new List<IssueCommentModel>();
   bool _commentsLoading = true;
-  bool _issueUpdated = false;
+  // bool _issueUpdated = false;
   bool _editTitle = false;
+  TabController _tabController;
+  ScrollController _discussionScrollController;
+  bool _showFab = true;
 
   IssuesState({@required this.repo,@required this.issue}):super();
 
-  Widget _buildIssueComment(){
+  Widget _buildIssueDiscussion(){
     bool _actionOpen = false;
     // print(issue.labels);
 
@@ -178,17 +188,106 @@ class IssuesState extends State<Issues>{
           );
         }).toList()
       );
-      createList.add(ListTile());
+      createList.add(Container(
+        margin: EdgeInsets.all(10),
+        child:Center(
+          child: Text('-- discuttion ends here --',style: TextStyle(color: Colors.grey),),)
+        )
+      );
     }
 
     return ListView(
+      controller: _discussionScrollController,
       children: createList
     );
   }
   
+  Widget _buildIssueProperties(){
+    return ListView(
+      children: <Widget>[
+
+        ListTile(
+          leading: Text('Labels'),
+          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+        ),
+
+        Divider(),
+
+
+        ListTile(
+          leading: Text('Milestones'),
+          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+        ),
+
+        Divider(),
+
+
+        ListTile(
+          leading: Text('Asignees'),
+          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+        ),
+
+        Divider(),
+
+
+        ListTile(
+          leading: Text('Notifications'),
+        ),
+        ListTile(
+          title: RaisedButton(
+            child: Text('Subscribe'),
+            onPressed: (){},
+          ),
+        ),
+        Divider(),
+
+        ListTile(
+          leading: Text('Time Tracker'),
+        ),
+        ListTile(
+          title: Row(
+            children: <Widget>[
+              Expanded(
+                child: RaisedButton(
+                  child: Text('Start'),
+                  onPressed: (){},
+                ),
+              ),
+              Expanded(
+                child: RaisedButton(
+                  child: Text('Add Timer'),
+                  onPressed: (){},
+                ),
+              )
+            ],
+          ),
+        ),
+        Divider(),
+
+        ListTile(
+          leading: Text('Due Date'),
+          trailing: Icon(Icons.add),
+        ),
+        ListTile(
+          title: Text('No due date set'),
+        ),
+        Divider(),
+
+        ListTile(
+          leading: Text('Dependencies'),
+          trailing: Icon(Icons.add),
+        ),
+        ListTile(
+
+        )
+
+      ],
+    );
+  }
+
   @override
   void initState(){
-    _issueUpdated=false;
+    // _issueUpdated=false;
     _renderIssue = issue;
     if(_commentsLoading && this.mounted){
       getIssueComments(repo, _renderIssue.number).then((v){
@@ -199,6 +298,11 @@ class IssuesState extends State<Issues>{
       });
     }
     _titleEditController = new TextEditingController(text: issue.title);
+    _tabController = new TabController(vsync: this,length: tabContents.length);
+    _tabController.addListener(_tabSwipeListener);
+    _discussionScrollController = new ScrollController();
+    _discussionScrollController.addListener(_discussionScrollListner);
+
     super.initState();
   }
 
@@ -234,9 +338,27 @@ class IssuesState extends State<Issues>{
     return Future.value(true);
   }
 
+  void _discussionScrollListner(){
+    setState(() {
+      _showFab = !(
+                    _discussionScrollController.position.userScrollDirection == ScrollDirection.reverse 
+                    && tabContents[_tabController.index].showFab
+                  );
+    });
+    
+  }
+
+  void _tabSwipeListener(){
+    setState(() {
+      _showFab = tabContents[_tabController.index].showFab;
+    });
+  }
+
   @override
   void dispose(){
     _focusNode.dispose();
+    _tabController.dispose();
+    _discussionScrollController.dispose();
     super.dispose();
   }
 
@@ -265,7 +387,7 @@ class IssuesState extends State<Issues>{
         // issue.title = _titleEditController.text;
         issue.comments+=1;
         _renderIssue=updated;
-        _issueUpdated = true;
+        // _issueUpdated = true;
       });
     }
     setState(() {
@@ -323,9 +445,26 @@ class IssuesState extends State<Issues>{
               )
             ]
             :null,
+            bottom: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabs: tabContents.map((tab){
+                return Tab(
+                  text:tab.title,
+                );
+              }).toList(),
+            ),
         ),
-        body: _buildIssueComment(),
-        floatingActionButton: FloatingActionButton(
+        body: Builder(
+          builder: (context) => TabBarView(
+            controller: _tabController,
+            children: <Widget>[
+              _buildIssueDiscussion(),
+              _buildIssueProperties()
+            ],
+          ),
+        ),
+        floatingActionButton: _showFab?FloatingActionButton(
           child: Icon(Icons.add_comment),
           onPressed: () async{
             await Navigator.of(context).push<bool>(
@@ -345,12 +484,11 @@ class IssuesState extends State<Issues>{
               });
             }
           },
-        ),
+        ):null,
       ),
     );
   }
 }
-
 
 class PopChoice{
   const PopChoice({this.title,this.icon});

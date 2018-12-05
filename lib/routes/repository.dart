@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 //import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -14,6 +15,8 @@ import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/milestone_model.dart';
 import 'package:beamu/model/label_model.dart';
 import 'package:beamu/model/user_model.dart';
+
+import 'package:beamu/model/app/tab_choice.dart';
 
 import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/center_text.dart';
@@ -32,17 +35,6 @@ class UrlContain{
   const UrlContain({this.title,this.url});
 }
 
-class Choice{
-  const Choice({
-    this.title
-    ,this.showFab
-    // ,this.fabIcon
-  });
-
-  final String title;
-  final bool showFab;
-  // final IconData fabIcon;
-}
 
 const List<Choice> tabContents = const <Choice>[
   const Choice(title: 'README' ,showFab: false),
@@ -73,6 +65,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   List<LabelModel> _labels = new List<LabelModel>();
 
   TabController _tabController;
+  ScrollController _scrollController;
 
   bool _readmeLoading = true;
   bool _showFAB = false;
@@ -84,6 +77,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     super.initState();
     _tabController = TabController(vsync: this,length: tabContents.length);
     _tabController.addListener(_tabChange);
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
 
     _getREADME();
     _getIssues();
@@ -96,6 +91,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   void dispose(){
     _tabController.removeListener(_tabChange);
     _tabController.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -179,6 +176,16 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     });
   }
 
+  void _scrollListener(){
+    setState(() {
+      _showFAB = !(
+                        _scrollController.position.userScrollDirection == ScrollDirection.reverse 
+                    && tabContents[_tabController.index].showFab 
+                    && (repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES')
+                  );
+    });
+  }
+
   Widget _buildUrlList(BuildContext curContext){
 
     List<UrlContain> urlList = [
@@ -222,6 +229,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     return CenterText(centerText: 'Issue not found',);
   }
   return ListView(
+    controller: _scrollController,
       children: _issues.map((issue){
         // String updateSince = timeSince(issue.updateAt);
         return Card(
@@ -322,6 +330,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     return ListView(
+      controller: _scrollController,
       children: _labels.map((l){
         return _buildLabelCard(l);
       }).toList(),
@@ -367,6 +376,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     return ListView(
+      controller: _scrollController,
       children: _milestones.map((m) =>  _buildSingleMilestone(m)).toList(),
     );
   }
@@ -404,6 +414,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     return GridView.count(
+      controller: _scrollController,
       crossAxisCount: 2,
       padding: EdgeInsets.all(16.0),
       childAspectRatio: 8.0/9.0,
