@@ -157,9 +157,10 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
         break;
       case 1:
         await Navigator.push(context, MaterialPageRoute(
-          builder: (context) => IssueCreator()
+          builder: (context) => IssueCreator(repoLabels: _labels,
+                                            repoMilestones: _milestones,
+                                            repoParticipants: _collaborators,)
         ));
-        print("1");
         break;
       case 2:
         print("2");
