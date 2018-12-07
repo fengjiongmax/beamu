@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:beamu/components/labels_display.dart';
+import 'package:beamu/components/select_label.dart';
+
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/label_model.dart';
 import 'package:beamu/model/milestone_model.dart';
@@ -48,48 +51,6 @@ class _IssueCreatorState extends State<IssueCreator>{
     _titleEditController.dispose();
     _bodyEditController.dispose();
     super.dispose();
-  }
-
-  void _displayLables() {
-    showDialog(
-      context: context,
-      builder: (context)=>AlertDialog(
-        title: Text('Select labels'),
-        content: ListView(
-          children: repoLabels ==null?<Widget>[]: repoLabels.map((l){
-            Color colorPicker = new Color(int.parse('0xFF'+l.color));
-            var y = 0.2126*colorPicker.red + 0.7152*colorPicker.green + 0.0722*colorPicker.blue;
-            return Card(
-              child: Container(
-                color: colorPicker,
-                child: ListTile(
-                  title: Text(
-                    l.name,
-                    style: TextStyle(
-                      color:y<128? Colors.white : Colors.black,
-                    ),
-                  ),
-                  trailing: _selectedLabel != null && _selectedLabel.contains(l)? Icon(Icons.check):null,
-                  onTap: (){
-                    //TODO: show checkbox icon when label is selected
-                    _selectedLabel.add(l);
-                  },
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-        actions: <Widget>[
-          MaterialButton(
-            child: Text('Cancel'),
-            onPressed: (){
-              Navigator.pop(context);
-              setState(() { });
-            },
-          )
-        ],
-      )
-    );
   }
 
   void _displayMilestones(){
@@ -143,28 +104,30 @@ class _IssueCreatorState extends State<IssueCreator>{
                 title: Divider(color: Colors.grey,),
                 trailing: IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: ()=> _displayLables(),
+                  onPressed: (){
+                    showDialog(
+                      context: context,
+                      builder: (context)=>new LabelSelector(
+                          repoLabels: repoLabels,
+                          selectedLabels: _selectedLabel,
+                        )
+                    ).then((v){
+                        _selectedLabel.sort((a,b){return a.id>b.id?1:0;});//sort by the order as shown in the labels list
+                        setState(() { });
+                      }
+                    );
+                  },
                 ),
               ),
               _selectedLabel==null || _selectedLabel.length == 0?
-                Text('no label')
-                :ListView(
-                  //TODO: this will cause problem when _selectedLabel is not null and length>0
-                  children: _selectedLabel.map((l){
-                    Color colorPicker = new Color(int.parse('0xFF'+l.color));
-                    var y = 0.2126*colorPicker.red + 0.7152*colorPicker.green + 0.0722*colorPicker.blue;
-                    return Card(
-                      color: colorPicker,
-                      child: ListTile(
-                        title: Text(
-                          l.name,
-                          style: TextStyle(
-                            color: y<128?Colors.white:Colors.black
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                Text('No label')
+                :Container(
+                  margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                  child: Column(
+                    children: _selectedLabel.map((l){
+                      return LabelCard(label: l,);
+                    }).toList(),
+                  ),
                 ),
 
               ListTile(

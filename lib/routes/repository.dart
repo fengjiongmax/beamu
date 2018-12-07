@@ -22,6 +22,7 @@ import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/center_text.dart';
 import 'package:beamu/components/loading.dart';
 import 'package:beamu/components/drawer.dart';
+import 'package:beamu/components/labels_display.dart';
 
 import 'package:beamu/share/time_since.dart';
 
@@ -305,37 +306,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
       return CenterText(centerText: 'Labels not found',);
     }
 
-    Widget _buildLabelCard(LabelModel label){
-      Color colorPicker = new Color(int.parse('0xFF'+label.color));
-      var y = 0.2126*colorPicker.red + 0.7152*colorPicker.green + 0.0722*colorPicker.blue;
-      return Card(
-        child: Container(
-          color: colorPicker,
-          child: ListTile(
-            title: Text(
-              label.name,
-              style: TextStyle(
-                color:y<128? Colors.white : Colors.black,
-              ),
-            ),
-            //TODO: Edit label
-            // trailing: IconButton(
-            //   icon: Icon(Icons.edit,color: Colors.grey,),
-            //   onPressed: (){
-                
-            //   },
-            // ),
-          ),
-        ),
-      );
-    }
-
-    return ListView(
-      controller: _scrollController,
-      children: _labels.map((l){
-        return _buildLabelCard(l);
-      }).toList(),
-    );
+    return LabelsDisplay(labels: _labels,scrollController: _scrollController,);
   }
 
   Widget _buildMilestones(){
