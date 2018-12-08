@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:beamu/components/labels_display.dart';
 import 'package:beamu/components/select_label.dart';
+import 'package:beamu/components/select_milestone.dart';
 
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/label_model.dart';
@@ -17,19 +18,10 @@ class IssueCreator extends StatefulWidget{
               :super(key:key);
 
   @override
-  _IssueCreatorState createState() => _IssueCreatorState(repoLabels: repoLabels,
-                                                        repoMilestones: repoMilestones,
-                                                        repoParticipants: repoParticipants);
+  _IssueCreatorState createState() => _IssueCreatorState();
 }
 
 class _IssueCreatorState extends State<IssueCreator>{
-  final List<LabelModel> repoLabels;
-  final List<MilestoneModel> repoMilestones;
-  final List<UserModel> repoParticipants;
-
-  _IssueCreatorState({this.repoLabels,this.repoMilestones,this.repoParticipants})
-                    :super();
-
   TextEditingController _titleEditController;
   TextEditingController _bodyEditController;
 
@@ -51,14 +43,6 @@ class _IssueCreatorState extends State<IssueCreator>{
     _titleEditController.dispose();
     _bodyEditController.dispose();
     super.dispose();
-  }
-
-  void _displayMilestones(){
-
-  }
-
-  void _displayCollaborators(){
-
   }
 
   @override
@@ -108,7 +92,7 @@ class _IssueCreatorState extends State<IssueCreator>{
                     showDialog(
                       context: context,
                       builder: (context)=>new LabelSelector(
-                          repoLabels: repoLabels,
+                          repoLabels: widget.repoLabels,
                           selectedLabels: _selectedLabel,
                         )
                     ).then((v){
@@ -136,15 +120,30 @@ class _IssueCreatorState extends State<IssueCreator>{
                 trailing: IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: (){
-
+                    showDialog(
+                      context: context,
+                      builder: (context) => new MilestoneSelector(
+                        repoMilestones: widget.repoMilestones,
+                        selectedMilestone: _milestone,
+                        onSelected: (m){
+                          setState(() {
+                            _milestone=m;
+                          });
+                          Navigator.pop(context);
+                        },
+                      )
+                    );
                   },
                 ),
               ),
               _milestone == null?
                 Text('No Milestone')
-                :Card(
-                  child: Text(
-                    _milestone.title
+                :Container(
+                  margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                  child: Card(
+                    child: ListTile(
+                      title: Text(_milestone.title),
+                    ),
                   ),
                 ),
 

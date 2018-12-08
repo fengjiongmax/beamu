@@ -9,16 +9,11 @@ class OrganizationDisplay extends StatefulWidget{
 
 
   @override
-  OrganizationDisplayState createState() => new OrganizationDisplayState(org:org);
+  OrganizationDisplayState createState() => new OrganizationDisplayState();
 
 }
 
 class OrganizationDisplayState extends State<OrganizationDisplay>{
-  final OrganizationModel org;
-
-  OrganizationDisplayState({@required this.org}):super();
-
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build

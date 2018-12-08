@@ -32,13 +32,10 @@ class Issues extends StatefulWidget{
   Issues({@required this.repo,@required this.issue,Key key}):super(key:key);
 
   @override
-  IssuesState createState() => new IssuesState(repo: repo,issue: issue);
+  IssuesState createState() => new IssuesState();
 }
 
 class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
-  final RepositoryModel repo;
-  final IssueModel issue;
-
   IssueModel _renderIssue;
   TextEditingController _titleEditController;
   FocusNode _focusNode = new FocusNode();
@@ -49,8 +46,6 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   TabController _tabController;
   ScrollController _discussionScrollController;
   bool _showFab = true;
-
-  IssuesState({@required this.repo,@required this.issue}):super();
 
   Widget _buildIssueDiscussion(){
     bool _actionOpen = false;
@@ -64,16 +59,16 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
             Container(
               child: ListTile(
                 contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
-                title:  Text(issue.user.username+","+timeSince(issue.createAt)),
-                trailing: issue.user.username==config.userName?
+                leading: Image.network(widget.issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
+                title:  Text(widget.issue.user.username+","+timeSince(widget.issue.createAt)),
+                trailing: widget.issue.user.username==config.userName?
                   IconButton(
                     icon: Icon(Icons.edit),
                     onPressed: (){
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context)=>Editor(url: config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues/'+issue.number.toString()
+                        MaterialPageRoute(builder: (context)=>Editor(url: config.giteaHost+'/api/v1/repos/'+widget.repo.owner.username+'/'+widget.repo.name+'/issues/'+widget.issue.number.toString()
                                                                     ,method:FINISH_METHOD.PATCH
-                                                                    ,issue: issue
+                                                                    ,issue: widget.issue
                                                                     ,body: BODY.ISSUE,))
                       );
                     },
@@ -89,15 +84,15 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
               margin: EdgeInsets.fromLTRB(10, 0, 0, 10),
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: MarkdownRender(
-                data: issue.body
+                data: widget.issue.body
               ),
             ),
-            issue.labels != null && issue.labels.isNotEmpty?
+            widget.issue.labels != null && widget.issue.labels.isNotEmpty?
             Container(
               height: 35.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children:  issue.labels.map((label){
+                children:  widget.issue.labels.map((label){
                   Color colorPicker = new Color(int.parse('0xFF'+label.color));
                   var y = 0.2126*colorPicker.red + 0.7152*colorPicker.green + 0.0722*colorPicker.blue;
                   return Container(
@@ -136,7 +131,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
                 Container(
                   child: ListTile(
                     contentPadding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    leading: Image.network(issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
+                    leading: Image.network(widget.issue.user.avatarUrl,height: 40.0,fit:BoxFit.contain),
                     title: Text(comment.user.username+","+timeSince(comment.createdAt)),
                     // trailing: comment.user.username==config.userName?
                     //   IconButton(
@@ -288,16 +283,16 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   @override
   void initState(){
     // _issueUpdated=false;
-    _renderIssue = issue;
+    _renderIssue = widget.issue;
     if(_commentsLoading && this.mounted){
-      getIssueComments(repo, _renderIssue.number).then((v){
+      getIssueComments(widget.repo, _renderIssue.number).then((v){
           setState(() {
           _comments.addAll(v);
           _commentsLoading = false;
         });
       });
     }
-    _titleEditController = new TextEditingController(text: issue.title);
+    _titleEditController = new TextEditingController(text: widget.issue.title);
     _tabController = new TabController(vsync: this,length: tabContents.length);
     _tabController.addListener(_tabSwipeListener);
     _discussionScrollController = new ScrollController();
@@ -308,7 +303,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
 
   Future<bool> _onWillPop(){
     if(_focusNode.hasFocus){
-      if(_titleEditController.text == issue.title){
+      if(_titleEditController.text == widget.issue.title){
         _focusNode.unfocus();
       } else {
         showDialog(
@@ -380,12 +375,12 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
 
   Future<void> _saveTitle() async{
     _focusNode.unfocus();
-    issue.title = _titleEditController.text;
-    var updated = await updateIssue(repo, issue);
+    widget.issue.title = _titleEditController.text;
+    var updated = await updateIssue(widget.repo, widget.issue);
     if(updated != null){
       setState(() {
         // issue.title = _titleEditController.text;
-        issue.comments+=1;
+        widget.issue.comments+=1;
         _renderIssue=updated;
         // _issueUpdated = true;
       });
@@ -415,7 +410,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
             //TODO: display title with multiple line
             _renderIssue.title
           ),
-          actions: repo.owner.username == config.userName && _renderIssue.user.username == config.userName ?
+          actions: widget.repo.owner.username == config.userName && _renderIssue.user.username == config.userName ?
             <Widget>[            
               PopupMenuButton(
                 onSelected: (PopChoice v){
@@ -470,13 +465,13 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
             await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                 builder: (context)=> Editor(url: config.giteaHost+'/api/v1/repos/'
-                                                                +repo.owner.username+'/'
-                                                                +repo.name+'/issues/'
+                                                                +widget.repo.owner.username+'/'
+                                                                +widget.repo.name+'/issues/'
                                                                 +_renderIssue.number.toString()+'/comments'
                                             ,body: BODY.COMMENT
                                             ,method: FINISH_METHOD.POST,))
             );
-            var _retList = await getIssueComments(repo, _renderIssue.number);
+            var _retList = await getIssueComments(widget.repo, _renderIssue.number);
             if(this.mounted){
               setState(() {
                 _comments.clear();

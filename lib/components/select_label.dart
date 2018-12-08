@@ -15,21 +15,10 @@ class LabelSelector extends StatefulWidget{
 }
 
 class _LabelSelectorState extends State<LabelSelector>{
-
-  @override
-  void initState(){
-    super.initState();
-  }
-
-  @override
-  void dispose(){
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        title: Text('Select labels'),
+        title: Text('Select Labels'),
         content: ListView(
           children: widget.repoLabels ==null?<Widget>[]: widget.repoLabels.map((l){
             Color colorPicker = new Color(int.parse('0xFF'+l.color));

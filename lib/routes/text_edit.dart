@@ -29,17 +29,10 @@ class Editor extends StatefulWidget{
   Editor({@required this.method,@required this.url,@required this.body,this.issue,this.comment,Key key}):super(key:key);
 
   @override
-  EditorState createState() => new EditorState(method: method,url: url,body: body,issue: issue,comment: comment);
+  EditorState createState() => new EditorState();
 }
 
 class EditorState extends State<Editor>{
-  final FINISH_METHOD method;
-  final String url;
-  final BODY body;
-  final IssueModel issue;
-  final IssueCommentModel comment;
-
-  EditorState({@required this.method,@required this.url,@required this.body,this.issue,this.comment}):super();
 
   String content;
   TextEditingController _controller ;
@@ -50,11 +43,11 @@ class EditorState extends State<Editor>{
   void initState(){
     _focusNode = new FocusNode();
     super.initState();
-    if(body == BODY.ISSUE){
-      _controller = new TextEditingController(text: issue==null?'':issue.body);
+    if(widget.body == BODY.ISSUE){
+      _controller = new TextEditingController(text: widget.issue==null?'':widget.issue.body);
     }
-    else if(body == BODY.COMMENT){
-      _controller = new TextEditingController(text: comment==null?'':comment.body);
+    else if(widget.body == BODY.COMMENT){
+      _controller = new TextEditingController(text: widget.comment==null?'':widget.comment.body);
     }
     setState(() {
       content=_controller.text;
@@ -70,10 +63,10 @@ class EditorState extends State<Editor>{
   Future<bool> _saveValue() async{
     bool _retVal = false;
     var _bodyString = _controller.text;
-    switch(body){
+    switch(widget.body){
       case BODY.COMMENT:
-        if(comment == null && method == FINISH_METHOD.POST){//update comment is not available for now
-          var response = await httpPost(url, '{"body":"'+_bodyString+'"}');
+        if(widget.comment == null && widget.method == FINISH_METHOD.POST){//update comment is not available for now
+          var response = await httpPost(widget.url, '{"body":"'+_bodyString+'"}');
           _retVal = response.statusCode == 201;
           _hintTextChanged = false;
         }

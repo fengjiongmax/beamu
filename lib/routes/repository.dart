@@ -36,7 +36,6 @@ class UrlContain{
   const UrlContain({this.title,this.url});
 }
 
-
 const List<Choice> tabContents = const <Choice>[
   const Choice(title: 'README' ,showFab: false),
   const Choice(title: 'ISSUES' ,showFab: true),
@@ -52,13 +51,11 @@ class Repository extends StatefulWidget{
   Repository({@required this.repo,Key key}):super(key:key);
 
   @override
-  State<StatefulWidget> createState() => new RepositoryState(repo: repo);
+  State<StatefulWidget> createState() => new RepositoryState();
 
 }
 
 class RepositoryState extends State<Repository> with SingleTickerProviderStateMixin {
-  final RepositoryModel repo;
-
   List<MilestoneModel> _milestones;
   List<IssueModel> _issues;
   String _readme;
@@ -70,8 +67,6 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   bool _readmeLoading = true;
   bool _showFAB = false;
-
-  RepositoryState({@required this.repo}):super();
 
   @override
   void initState(){
@@ -117,8 +112,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Column(
             children: <Widget>[
-              Text(repo.owner.username+"/"+repo.name),
-              Text(timeSince(repo.updatedAt))
+              Text(widget.repo.owner.username+"/"+widget.repo.name),
+              Text(timeSince(widget.repo.updatedAt))
             ],
           ),
         ),
@@ -173,7 +168,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   void _tabChange(){
     setState(() {
-      _showFAB=tabContents[_tabController.index].showFab && (repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES');
+      _showFAB=tabContents[_tabController.index].showFab && (widget.repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES');
       // _fabChild=_showFAB?tabContents[_tabController.index].fabIcon:null;
     });
   }
@@ -181,9 +176,9 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   void _scrollListener(){
     setState(() {
       _showFAB = !(
-                        _scrollController.position.userScrollDirection == ScrollDirection.reverse 
+                  _scrollController.position.userScrollDirection == ScrollDirection.reverse 
                     && tabContents[_tabController.index].showFab 
-                    && (repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES')
+                    && (widget.repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES')
                   );
     });
   }
@@ -191,9 +186,9 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   Widget _buildUrlList(BuildContext curContext){
 
     List<UrlContain> urlList = [
-      UrlContain(title: 'SSH',url: repo.sshUrl),
-      UrlContain(title: 'HTML',url: repo.htmlUrl),
-      UrlContain(title: 'CLONE',url: repo.cloneUrl)
+      UrlContain(title: 'SSH',url: widget.repo.sshUrl),
+      UrlContain(title: 'HTML',url: widget.repo.htmlUrl),
+      UrlContain(title: 'CLONE',url: widget.repo.cloneUrl)
     ];
     return Center(
       child: ListView(
@@ -259,7 +254,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                   onTap: () async{
                     //TODO:update depend on if issue's updated.
                     await Navigator.of(context).push<bool>(MaterialPageRoute(
-                                            builder: (context)=>Issues(repo: repo,issue: issue)
+                                            builder: (context)=>Issues(repo: widget.repo,issue: issue)
                                           )
                                         );
                     _getIssues();
@@ -397,7 +392,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getREADME(){
-    getDefaultREADME(repo).then((v){
+    getDefaultREADME(widget.repo).then((v){
       if(this.mounted){
         setState(() {
           _readme = v;
@@ -408,7 +403,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getIssues(){
-    getRepoIssues(repo).then((v){
+    getRepoIssues(widget.repo).then((v){
       if(this.mounted){
         setState(() {
           _issues = v;
@@ -418,7 +413,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getLables(){
-    getRepoLabels(repo).then((v){
+    getRepoLabels(widget.repo).then((v){
       if(this.mounted){
         setState(() {
           _labels=v;
@@ -428,7 +423,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getMilestones(){
-    getRepoMilestones(repo).then((v){
+    getRepoMilestones(widget.repo).then((v){
       if(this.mounted){
         setState(() {
           _milestones=v;
@@ -438,7 +433,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getCollaborators(){
-    getRepoCollaborators(repo).then((v){
+    getRepoCollaborators(widget.repo).then((v){
       if(this.mounted){
         setState(() {
           _collaborators=v;
