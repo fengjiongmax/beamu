@@ -8,7 +8,9 @@ import 'package:beamu/routes/text_edit.dart';
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/issue_comment_model.dart';
 import 'package:beamu/model/repository_model.dart';
-
+import 'package:beamu/model/label_model.dart';
+import 'package:beamu/model/milestone_model.dart';
+import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/app/tab_choice.dart';
 
 import 'package:beamu/data/issue_data.dart';
@@ -16,6 +18,11 @@ import 'package:beamu/data/issue_data.dart';
 import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/loading.dart';
 import 'package:beamu/components/drawer.dart';
+import 'package:beamu/components/select_assignee.dart';
+import 'package:beamu/components/select_label.dart';
+import 'package:beamu/components/select_milestone.dart';
+import 'package:beamu/components/labels_display.dart';
+import 'package:beamu/components/center_text.dart';
 
 import 'package:beamu/share/time_since.dart';
 import 'package:beamu/share/configs.dart';
@@ -28,8 +35,19 @@ const List<Choice> tabContents= const<Choice>[
 class Issues extends StatefulWidget{
   final RepositoryModel repo;
   final IssueModel issue;
+  final List<LabelModel> repoLabels;
+  final List<IssueModel> repoIssues;//depends not available in api yet.
+  final List<MilestoneModel> repoMilestones;
+  final List<UserModel> assigneeCandidate;
 
-  Issues({@required this.repo,@required this.issue,Key key}):super(key:key);
+  Issues({@required this.repo,
+          @required this.repoLabels,
+          @required this.repoMilestones,
+          @required this.assigneeCandidate,
+          @required this.issue,
+          @required this.repoIssues,
+          Key key
+          }):super(key:key);
 
   @override
   IssuesState createState() => new IssuesState();
@@ -46,6 +64,35 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   TabController _tabController;
   ScrollController _discussionScrollController;
   bool _showFab = true;
+
+  @override
+  void initState(){
+    // _issueUpdated=false;
+    _renderIssue = widget.issue;
+    if(_commentsLoading && this.mounted){
+      getIssueComments(widget.repo, _renderIssue.number).then((v){
+          setState(() {
+          _comments.addAll(v);
+          _commentsLoading = false;
+        });
+      });
+    }
+    _titleEditController = new TextEditingController(text: widget.issue.title);
+    _tabController = new TabController(vsync: this,length: tabContents.length);
+    _tabController.addListener(_tabSwipeListener);
+    _discussionScrollController = new ScrollController();
+    _discussionScrollController.addListener(_discussionScrollListner);
+
+    super.initState();
+  }
+
+  @override
+  void dispose(){
+    _focusNode.dispose();
+    _tabController.dispose();
+    _discussionScrollController.dispose();
+    super.dispose();
+  }
 
   Widget _buildIssueDiscussion(){
     bool _actionOpen = false;
@@ -203,26 +250,105 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
 
         ListTile(
           leading: Text('Labels'),
-          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+          title: Divider(color: Colors.grey,),
+          trailing: IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (context)=>new LabelSelector(
+                    repoLabels: widget.repoLabels,
+                    selectedLabels: widget.issue.labels,
+                  )
+              ).then((v){
+                  widget.issue.labels.sort((a,b){return a.id>b.id?1:0;});//sort by the order as shown in the labels list
+                  setState(() { });
+                }
+              );
+            },
+          ),
         ),
-
-        Divider(),
-
+        widget.issue.labels==null || widget.issue.labels.length == 0?
+          CenterText(centerText:'No label')
+          :Container(
+            margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child: Column(
+              children: widget.issue.labels.map((l){
+                return LabelCard(label: l,);
+              }).toList(),
+            ),
+          ),
 
         ListTile(
           leading: Text('Milestones'),
-          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+          title: Divider(color: Colors.grey,),
+          trailing: IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (context) => new MilestoneSelector(
+                  repoMilestones: widget.repoMilestones,
+                  selectedMilestone: widget.issue.milestone,
+                  onSelected: (m){
+                    setState(() {
+                      widget.issue.milestone=m;
+                    });
+                    Navigator.pop(context);
+                  },
+                )
+              );
+            },
+          ),
         ),
-
-        Divider(),
+        widget.issue.milestone == null?
+          CenterText(centerText:'No milestone')
+          :Container(
+            margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child: Card(
+              child: ListTile(
+                title: Text(widget.issue.milestone.title),
+              ),
+            ),
+          ),
 
 
         ListTile(
           leading: Text('Asignees'),
-          trailing: IconButton(icon: Icon(Icons.add),onPressed: (){},),
+          title: Divider(color: Colors.grey,),
+          trailing: IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (context) => new AssigneeSelector(
+                  assigneeCandidate: widget.assigneeCandidate,
+                  assignees: widget.issue.assignees,
+                )
+              ).then((v){
+                widget.issue.assignees.sort((a,b){return a.id>b.id? 1:0;});
+                setState(() { });
+              });
+            },
+          ),
         ),
-
-        Divider(),
+        widget.issue.assignees == null || widget.issue.assignees.length ==0?
+          CenterText(centerText:'No Assignees')
+          :Container(
+            margin: EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child: Column(
+              children: widget.issue.assignees.map((a){
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Image.network(a.avatarUrl),
+                    ),
+                    title: Text(a.username),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
 
 
         ListTile(
@@ -280,27 +406,6 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
     );
   }
 
-  @override
-  void initState(){
-    // _issueUpdated=false;
-    _renderIssue = widget.issue;
-    if(_commentsLoading && this.mounted){
-      getIssueComments(widget.repo, _renderIssue.number).then((v){
-          setState(() {
-          _comments.addAll(v);
-          _commentsLoading = false;
-        });
-      });
-    }
-    _titleEditController = new TextEditingController(text: widget.issue.title);
-    _tabController = new TabController(vsync: this,length: tabContents.length);
-    _tabController.addListener(_tabSwipeListener);
-    _discussionScrollController = new ScrollController();
-    _discussionScrollController.addListener(_discussionScrollListner);
-
-    super.initState();
-  }
-
   Future<bool> _onWillPop(){
     if(_focusNode.hasFocus){
       if(_titleEditController.text == widget.issue.title){
@@ -349,14 +454,6 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
     });
   }
 
-  @override
-  void dispose(){
-    _focusNode.dispose();
-    _tabController.dispose();
-    _discussionScrollController.dispose();
-    super.dispose();
-  }
-
   PreferredSizeWidget _editIssueTitle(){
     return AppBar(
       automaticallyImplyLeading: false,
@@ -374,6 +471,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   } 
 
   Future<void> _saveTitle() async{
+    //TODO: save issue everytime when change value from discussions or properties
     _focusNode.unfocus();
     widget.issue.title = _titleEditController.text;
     var updated = await updateIssue(widget.repo, widget.issue);
@@ -408,7 +506,10 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
           ),
           title: Text(
             //TODO: display title with multiple line
-            _renderIssue.title
+            _renderIssue.title,
+            softWrap: false,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           actions: widget.repo.owner.username == config.userName && _renderIssue.user.username == config.userName ?
             <Widget>[            

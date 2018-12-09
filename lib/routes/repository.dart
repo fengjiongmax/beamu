@@ -9,12 +9,14 @@ import 'package:beamu/data/issue_data.dart';
 import 'package:beamu/data/repository_data.dart';
 import 'package:beamu/data/milestone_data.dart';
 import 'package:beamu/data/label_data.dart';
+import 'package:beamu/data/organization_data.dart';
 
 import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/model/issue_model.dart';
 import 'package:beamu/model/milestone_model.dart';
 import 'package:beamu/model/label_model.dart';
 import 'package:beamu/model/user_model.dart';
+import 'package:beamu/model/organization_model.dart';
 
 import 'package:beamu/model/app/tab_choice.dart';
 
@@ -47,8 +49,9 @@ const List<Choice> tabContents = const <Choice>[
 
 class Repository extends StatefulWidget{
   final RepositoryModel repo;
+  final bool isOwnerOrg;
 
-  Repository({@required this.repo,Key key}):super(key:key);
+  Repository({@required this.repo,@required this.isOwnerOrg,Key key}):super(key:key);
 
   @override
   State<StatefulWidget> createState() => new RepositoryState();
@@ -56,11 +59,12 @@ class Repository extends StatefulWidget{
 }
 
 class RepositoryState extends State<Repository> with SingleTickerProviderStateMixin {
-  List<MilestoneModel> _milestones;
-  List<IssueModel> _issues;
+  List<MilestoneModel> _milestones = List<MilestoneModel>();
+  List<IssueModel> _issues = List<IssueModel>();
   String _readme;
   List<UserModel> _collaborators = new List<UserModel>();
   List<LabelModel> _labels = new List<LabelModel>();
+  List<UserModel> _orgMembers = new List<UserModel>();
 
   TabController _tabController;
   ScrollController _scrollController;
@@ -81,6 +85,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     _getLables();
     _getMilestones();
     _getCollaborators();
+    _getOwnerMembers();
   }
 
   @override
@@ -149,13 +154,16 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   void _onPlusPressed() async{
     switch(_tabController.index){
       case 0:
-        print("0");
         break;
       case 1:
+        var _assigneeCandidate = _collaborators.sublist(0);//this copy from _collaborators to _assigneeCandidate
+        if(widget.isOwnerOrg) _assigneeCandidate.addAll(_orgMembers); // add member if owner of this repo is org
+        else if(!_collaborators.contains(widget.repo.owner)) _assigneeCandidate.add(widget.repo.owner); //add owner if does not contains owner
         await Navigator.push(context, MaterialPageRoute(
-          builder: (context) => IssueCreator(repoLabels: _labels,
+          builder: (context) => IssueCreator(repo: widget.repo,
+                                            repoLabels: _labels,
                                             repoMilestones: _milestones,
-                                            repoParticipants: _collaborators,)
+                                            assigneeCandidate: _assigneeCandidate,)
         ));
         break;
       case 2:
@@ -223,7 +231,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
     
   if(_issues ==null || _issues.isEmpty || _issues.length==0){
-    return CenterText(centerText: 'Issue not found',);
+    return CenterText(centerText: 'No issue',);
   }
   return ListView(
     controller: _scrollController,
@@ -253,8 +261,18 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
                   ),
                   onTap: () async{
                     //TODO:update depend on if issue's updated.
+
+        var _assigneeCandidate = _collaborators.sublist(0);//this copy from _collaborators to _assigneeCandidate
+        if(widget.isOwnerOrg) _assigneeCandidate.addAll(_orgMembers); // add member if owner of this repo is org
+        else if(!_collaborators.contains(widget.repo.owner)) _assigneeCandidate.add(widget.repo.owner); //add owner if does not contains owner
                     await Navigator.of(context).push<bool>(MaterialPageRoute(
-                                            builder: (context)=>Issues(repo: widget.repo,issue: issue)
+                                            builder: (context)=>Issues(repo: widget.repo,
+                                                                        issue: issue,
+                                                                        repoIssues: _issues,
+                                                                        repoLabels: _labels,
+                                                                        repoMilestones: _milestones,
+                                                                        assigneeCandidate: _assigneeCandidate,
+                                                                )
                                           )
                                         );
                     _getIssues();
@@ -298,7 +316,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     if(_labels.isEmpty || _labels.length==0){
-      return CenterText(centerText: 'Labels not found',);
+      return CenterText(centerText: 'No label',);
     }
 
     return LabelsDisplay(labels: _labels,scrollController: _scrollController,);
@@ -310,7 +328,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     if(_milestones.isEmpty || _milestones.length==0){
-      return CenterText(centerText: 'Milestone not found',);
+      return CenterText(centerText: 'No milestone',);
     }
 
     Widget _buildSingleMilestone(MilestoneModel milestone){
@@ -354,7 +372,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     }
 
     if(_collaborators.isEmpty || _collaborators.length==0){
-      return CenterText(centerText: 'Collaborators not found',);
+      return CenterText(centerText: 'No collaborator',);
     }
 
     Widget _buildUserCard(UserModel user){
@@ -406,7 +424,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoIssues(widget.repo).then((v){
       if(this.mounted){
         setState(() {
-          _issues = v;
+          _issues.addAll(v);
         });
       }
     });
@@ -416,7 +434,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoLabels(widget.repo).then((v){
       if(this.mounted){
         setState(() {
-          _labels=v;
+          _labels.addAll(v);
         });
       }
     });
@@ -426,7 +444,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoMilestones(widget.repo).then((v){
       if(this.mounted){
         setState(() {
-          _milestones=v;
+          _milestones.addAll(v);
         });
       }
     });
@@ -436,10 +454,23 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoCollaborators(widget.repo).then((v){
       if(this.mounted){
         setState(() {
-          _collaborators=v;
+          _collaborators.addAll(v);
         });
       }
     });
+  }
+
+  void _getOwnerMembers(){
+    if(widget.isOwnerOrg){
+      getOrgMembers(OrganizationModel(userName: widget.repo.owner.username))
+        .then((v){
+          if(this.mounted){
+            setState(() {
+              _orgMembers.addAll(v);
+            });
+          }
+        });
+    }
   }
 }
 

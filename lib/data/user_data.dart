@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/repository_model.dart';
+import 'package:beamu/model/organization_model.dart';
 
 import 'package:beamu/share/requests.dart';
 import 'package:beamu/share/configs.dart';
@@ -23,3 +24,14 @@ Future<List<UserModel>> getRepoCollaborators(RepositoryModel repo) async{
   List<UserModel> collaborators = _parsed.map<UserModel>((json) => UserModel.fromJson(json)).toList();
   return collaborators;
 }
+
+Future<List<UserModel>> getOrgMembers(OrganizationModel org) async{
+  final url = config.giteaHost +'/api/v1/orgs/'+org.userName+'/members';
+  final response = await httpGet(url);
+
+  final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
+  List<UserModel> members = _parsed.map<UserModel>((json)=>UserModel.fromJson(json));
+
+  return members;
+}
+

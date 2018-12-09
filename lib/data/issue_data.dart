@@ -37,3 +37,12 @@ Future<IssueModel> updateIssue(RepositoryModel repo,IssueModel issue) async{
   IssueModel returnIssue = IssueModel.fromJson(_parsed);
   return returnIssue;
 }
+
+Future<IssueModel> createIssue(RepositoryModel repo,SubmitIssueModel toCreateIssue) async{
+  var _url = config.giteaHost + '/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/issues';
+  var _response = await httpPost(_url, toCreateIssue.toJsonString());
+
+  final _parsed = json.decode(_response.body);
+  IssueModel returnIssue = IssueModel.fromJson(_parsed);
+  return returnIssue;
+}

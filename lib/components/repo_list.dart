@@ -9,8 +9,9 @@ import 'package:beamu/routes/repository.dart';
 class RepositoriesListDisplay extends StatelessWidget{
   final List<RepositoryModel> repoList;
   final String userName;
+  final bool isOwnerOrg;
 
-  RepositoriesListDisplay({this.repoList,this.userName,Key key}):super(key:key);
+  RepositoriesListDisplay({this.repoList,this.userName,this.isOwnerOrg,Key key}):super(key:key);
 
   @override
   Widget build(BuildContext context){
@@ -50,7 +51,7 @@ class RepositoriesListDisplay extends StatelessWidget{
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Repository(repo: repo)
+                      builder: (context) => Repository(repo: repo,isOwnerOrg: isOwnerOrg,)
                     )
                   );
                 },

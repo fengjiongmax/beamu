@@ -29,6 +29,9 @@ class _LabelSelectorState extends State<LabelSelector>{
                 child: ListTile(
                   title: Text(
                     l.name,
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color:y<128? Colors.white : Colors.black,
                     ),
@@ -50,6 +53,13 @@ class _LabelSelectorState extends State<LabelSelector>{
           }).toList(),
         ),
         actions: <Widget>[
+          MaterialButton(
+            child: Text('Clear'),
+            onPressed: (){
+              widget.selectedLabels.clear();
+              Navigator.pop(context);
+            },
+          ),
           MaterialButton(
             child: Text('Close'),
             onPressed: (){

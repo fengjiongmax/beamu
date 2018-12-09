@@ -84,15 +84,17 @@ class IssueModel{
 
 
 class SubmitIssueModel{
-  SubmitIssueModel({this.assignee,this.assignees,this.body,this.dueDate,this.milestone,this.state,this.title});
+  SubmitIssueModel({this.assignee,this.assignees,this.labels,this.body,this.closed,this.dueDate,this.milestone,this.state,this.title});
 
   UserModel assignee;
   List<UserModel> assignees;
   String body;
   DateTime dueDate;
+  List<LabelModel> labels;
   MilestoneModel milestone;
   String state;
   String title;
+  bool closed;
 
   factory SubmitIssueModel.fromIssue(IssueModel issue){
     return SubmitIssueModel(
@@ -100,9 +102,10 @@ class SubmitIssueModel{
       assignees: issue.assignees,
       body:  issue.body,
       dueDate: issue.dueDate,
+      labels: issue.labels,
       milestone: issue.milestone,
       state: issue.state,
-      title: issue.title
+      title: issue.title,
     );
   }
 
@@ -111,9 +114,11 @@ class SubmitIssueModel{
     'assignees': assignees==null?null:assignees.map((v){return v.username;}).toList(),
     'body':  body,
     'due_date': dueDate==null?null:dueDate.toUtc(),
-    'milestone': milestone,
+    'labels': labels == null? null:labels.map((l){return l.id;}).toList(),
+    'milestone': milestone==null?null: milestone.id,
     'state': state,
-    'title': title
+    'title': title,
+    'closed':closed
   };
 
   String toJsonString() {

@@ -117,7 +117,10 @@ class RepositoriesListState extends State<RepositoriesList>{
         bottomOpacity: 0.7,
       ),
       body: _repoLoading? Center(child: LoadingContent(),)
-                        : RepositoriesListDisplay(repoList: _reposList,userName: _displayUserName,)
+                        : RepositoriesListDisplay(
+                            repoList: _reposList,
+                            userName: _displayUserName,
+                            isOwnerOrg: _orgsList.where((w){return w.userName==_displayUserName;}).length>0),
     );
   }
 }
