@@ -424,6 +424,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoIssues(widget.repo).then((v){
       if(this.mounted){
         setState(() {
+          _issues.clear();
           _issues.addAll(v);
         });
       }
@@ -434,6 +435,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoLabels(widget.repo).then((v){
       if(this.mounted){
         setState(() {
+          _labels.clear();
           _labels.addAll(v);
         });
       }
@@ -444,6 +446,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoMilestones(widget.repo).then((v){
       if(this.mounted){
         setState(() {
+          _milestones.clear();
           _milestones.addAll(v);
         });
       }
@@ -454,6 +457,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     getRepoCollaborators(widget.repo).then((v){
       if(this.mounted){
         setState(() {
+          _collaborators.clear();
           _collaborators.addAll(v);
         });
       }
@@ -466,6 +470,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
         .then((v){
           if(this.mounted){
             setState(() {
+              _orgMembers.clear();
               _orgMembers.addAll(v);
             });
           }
