@@ -40,6 +40,7 @@ class _IssueCreatorState extends State<IssueCreator>{
 
   bool _isBodyEmpty = false;
   bool _isTitleEmpty = false;
+  bool _createPressed = false;
 
   @override
   void initState(){
@@ -85,19 +86,23 @@ class _IssueCreatorState extends State<IssueCreator>{
       });
     }
 
-    SubmitIssueModel _toCreate = new SubmitIssueModel(
-      title: _titleEditController.text,
-      body: _bodyEditController.text,
-      assignees: _assignees,
-      labels: _selectedLabel,
-      milestone: _milestone,
-      closed:false,
-    );
+    if(!_createPressed){
+      _createPressed= true;
+      SubmitIssueModel _toCreate = new SubmitIssueModel(
+        title: _titleEditController.text,
+        body: _bodyEditController.text,
+        assignees: _assignees,
+        labels: _selectedLabel,
+        milestone: _milestone,
+        closed:false,
+      );
 
-    createIssue(widget.repo, _toCreate).then((v){
-      widget.repoIssues.add(v);
-      Navigator.of(context).pop();
-    });
+      createIssue(widget.repo, _toCreate).then((v){
+        widget.repoIssues.add(v);
+        Navigator.of(context).pop();
+      });
+    }
+
   }
 
   @override
