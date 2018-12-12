@@ -3,10 +3,11 @@ import 'package:beamu/model/repository_model.dart';
 import 'package:beamu/share/configs.dart';
 import 'package:beamu/share/requests.dart';
 
-Future<String> getREADME(RepositoryModel repo) async{
+Future<String> getREADME(String ownerName,String repoName,String branchName) async{
   final url = config.giteaHost+"/api/v1/repos/"
-                            +repo.owner.username+"/"
-                            +repo.name+"/raw/master/README.md";
+                            +ownerName+"/"
+                            +repoName+"/raw/"
+                            +branchName+"/README.md";
   final response = await httpGet(url);
 
   if(response.statusCode != 200){

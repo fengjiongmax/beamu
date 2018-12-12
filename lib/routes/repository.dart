@@ -410,7 +410,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getREADME(){
-    getDefaultREADME(widget.repo).then((v){
+    getDefaultREADME(widget.repo.owner.username,widget.repo.name,widget.repo.defaultBranch).then((v){
       if(this.mounted){
         setState(() {
           _readme = v;
@@ -421,7 +421,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getIssues(){
-    getRepoIssues(widget.repo).then((v){
+    getRepoIssues(widget.repo.owner.username,widget.repo.name).then((v){
       if(this.mounted){
         setState(() {
           _issues.clear();
@@ -432,7 +432,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getLables(){
-    getRepoLabels(widget.repo).then((v){
+    getRepoLabels(widget.repo.owner.username,widget.repo.name).then((v){
       if(this.mounted){
         setState(() {
           _labels.clear();
@@ -443,7 +443,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getMilestones(){
-    getRepoMilestones(widget.repo).then((v){
+    getRepoMilestones(widget.repo.owner.username,widget.repo.name).then((v){
       if(this.mounted){
         setState(() {
           _milestones.clear();
@@ -454,7 +454,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getCollaborators(){
-    getRepoCollaborators(widget.repo).then((v){
+    getRepoCollaborators(widget.repo.owner.username,widget.repo.name).then((v){
       if(this.mounted){
         setState(() {
           _collaborators.clear();
@@ -466,7 +466,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   void _getOwnerMembers(){
     if(widget.isOwnerOrg){
-      getOrgMembers(OrganizationModel(userName: widget.repo.owner.username))
+      getOrgMembers(widget.repo.owner.username)
         .then((v){
           if(this.mounted){
             setState(() {

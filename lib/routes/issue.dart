@@ -65,17 +65,23 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   ScrollController _discussionScrollController;
   bool _showFab = true;
 
-  @override
-  void initState(){
-    // _issueUpdated=false;
-    _renderIssue = widget.issue;
-    if(_commentsLoading && this.mounted){
-      getIssueComments(widget.repo, _renderIssue.number).then((v){
+  void _getComments() {
+    if(this.mounted){
+      getIssueComments(widget.repo.owner.username,widget.repo.name, _renderIssue.number).then((v){
           setState(() {
           _comments.addAll(v);
           _commentsLoading = false;
         });
       });
+    }
+  }
+
+  @override
+  void initState(){
+    // _issueUpdated=false;
+    _renderIssue = widget.issue;
+    if(_commentsLoading ){
+      _getComments();
     }
     _titleEditController = new TextEditingController(text: widget.issue.title);
     _tabController = new TabController(vsync: this,length: tabContents.length);
@@ -474,7 +480,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
     //TODO: save issue everytime when change value from discussions or properties
     _focusNode.unfocus();
     widget.issue.title = _titleEditController.text;
-    var updated = await updateIssue(widget.repo, widget.issue);
+    var updated = await updateIssue(widget.repo.owner.username,widget.repo.name, widget.issue);
     if(updated != null){
       setState(() {
         // issue.title = _titleEditController.text;
@@ -571,14 +577,9 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
                                                                 +_renderIssue.number.toString()+'/comments'
                                             ,body: BODY.COMMENT
                                             ,method: FINISH_METHOD.POST,))
-            );
-            var _retList = await getIssueComments(widget.repo, _renderIssue.number);
-            if(this.mounted){
-              setState(() {
-                _comments.clear();
-                _comments.addAll(_retList);
-              });
-            }
+            ).then((v){
+              _getComments();
+            });
           },
         ):null,
       ),

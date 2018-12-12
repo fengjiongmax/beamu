@@ -97,7 +97,7 @@ class _IssueCreatorState extends State<IssueCreator>{
         closed:false,
       );
 
-      createIssue(widget.repo, _toCreate).then((v){
+      createIssue(widget.repo.owner.username,widget.repo.name, _toCreate).then((v){
         widget.repoIssues.add(v);
         Navigator.of(context).pop();
       });

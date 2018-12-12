@@ -16,8 +16,8 @@ Future<UserModel> getUser(String userName) async{
   return user;
 }
 
-Future<List<UserModel>> getRepoCollaborators(RepositoryModel repo) async{
-  final url = config.giteaHost+'/api/v1/repos/'+repo.owner.username+'/'+repo.name+'/collaborators';
+Future<List<UserModel>> getRepoCollaborators(String ownerName,String repoName) async{
+  final url = config.giteaHost+'/api/v1/repos/'+ownerName+'/'+repoName+'/collaborators';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
@@ -25,8 +25,8 @@ Future<List<UserModel>> getRepoCollaborators(RepositoryModel repo) async{
   return collaborators;
 }
 
-Future<List<UserModel>> getOrgMembers(OrganizationModel org) async{
-  final url = config.giteaHost +'/api/v1/orgs/'+org.userName+'/members';
+Future<List<UserModel>> getOrgMembers(String orgName) async{
+  final url = config.giteaHost +'/api/v1/orgs/'+orgName+'/members';
   final response = await httpGet(url);
 
   final _parsed = json.decode(response.body).cast<Map<String,dynamic>>();
