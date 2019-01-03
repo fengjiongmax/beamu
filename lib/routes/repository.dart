@@ -48,10 +48,13 @@ const List<Choice> tabContents = const <Choice>[
 ];
 
 class Repository extends StatefulWidget{
-  final RepositoryModel repo;
+  final String owner;
+  final String repoName;
+
+  // final RepositoryModel repo;
   final bool isOwnerOrg;
 
-  Repository({@required this.repo,@required this.isOwnerOrg,Key key}):super(key:key);
+  Repository({@required this.owner,@required this.repoName,@required this.isOwnerOrg,Key key}):super(key:key);
 
   @override
   State<StatefulWidget> createState() => new RepositoryState();
@@ -65,6 +68,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   List<UserModel> _collaborators = new List<UserModel>();
   List<LabelModel> _labels = new List<LabelModel>();
   List<UserModel> _orgMembers = new List<UserModel>();
+  RepositoryModel _repo;
 
   TabController _tabController;
   ScrollController _scrollController;
@@ -80,7 +84,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
 
-    _getREADME();
+    _getRepoInfo();
     _getIssues();
     _getLables();
     _getMilestones();
@@ -117,8 +121,8 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
           margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Column(
             children: <Widget>[
-              Text(widget.repo.owner.username+"/"+widget.repo.name),
-              Text(timeSince(widget.repo.updatedAt))
+              Text(widget.owner+"/"+widget.repoName),
+              // Text(timeSince(widget.repo.updatedAt))
             ],
           ),
         ),
@@ -156,15 +160,15 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
       case 0:
         break;
       case 1:
-        var _assigneeCandidate = _collaborators.sublist(0);//this copy from _collaborators to _assigneeCandidate
-        if(widget.isOwnerOrg) _assigneeCandidate.addAll(_orgMembers); // add member if owner of this repo is org
-        else if(!_collaborators.contains(widget.repo.owner)) _assigneeCandidate.add(widget.repo.owner); //add owner if does not contains owner
-        await Navigator.push(context, MaterialPageRoute(
-          builder: (context) => IssueCreator(repo: widget.repo,
-                                            repoLabels: _labels,
-                                            repoMilestones: _milestones,
-                                            assigneeCandidate: _assigneeCandidate,)
-        ));
+        // var _assigneeCandidate = _collaborators.sublist(0);//this copy from _collaborators to _assigneeCandidate
+        // if(widget.isOwnerOrg) _assigneeCandidate.addAll(_orgMembers); // add member if owner of this repo is org
+        // else if(!_collaborators.contains(widget.owner)) _assigneeCandidate.add(widget.owner); //add owner if does not contains owner
+        // await Navigator.push(context, MaterialPageRoute(
+        //   builder: (context) => IssueCreator(repo: widget.repo,
+        //                                     repoLabels: _labels,
+        //                                     repoMilestones: _milestones,
+        //                                     assigneeCandidate: _assigneeCandidate,)
+        // ));
         break;
       case 2:
         print("2");
@@ -176,27 +180,30 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   void _tabChange(){
     setState(() {
-      _showFAB=tabContents[_tabController.index].showFab && (widget.repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES');
+      _showFAB=tabContents[_tabController.index].showFab && tabContents[_tabController.index].title=='ISSUES';
       // _fabChild=_showFAB?tabContents[_tabController.index].fabIcon:null;
     });
   }
 
   void _scrollListener(){
     setState(() {
-      _showFAB = !(
-                  _scrollController.position.userScrollDirection == ScrollDirection.reverse 
-                    && tabContents[_tabController.index].showFab 
-                    && (widget.repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES')
-                  );
+      // _showFAB = !(
+      //             _scrollController.position.userScrollDirection == ScrollDirection.reverse 
+      //               && tabContents[_tabController.index].showFab 
+      //               && (widget.repo.permissions.admin || tabContents[_tabController.index].title=='ISSUES')
+      //             );
     });
   }
 
   Widget _buildUrlList(BuildContext curContext){
+    if(_repo == null){
+      return LoadingContent();
+    }
 
     List<UrlContain> urlList = [
-      UrlContain(title: 'SSH',url: widget.repo.sshUrl),
-      UrlContain(title: 'HTML',url: widget.repo.htmlUrl),
-      UrlContain(title: 'CLONE',url: widget.repo.cloneUrl)
+      UrlContain(title: 'SSH',url: _repo.sshUrl),
+      UrlContain(title: 'HTML',url: _repo.htmlUrl),
+      UrlContain(title: 'CLONE',url: _repo.cloneUrl)
     ];
     return Center(
       child: ListView(
@@ -264,9 +271,9 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
         var _assigneeCandidate = _collaborators.sublist(0);//this copy from _collaborators to _assigneeCandidate
         if(widget.isOwnerOrg) _assigneeCandidate.addAll(_orgMembers); // add member if owner of this repo is org
-        else if(!_collaborators.contains(widget.repo.owner)) _assigneeCandidate.add(widget.repo.owner); //add owner if does not contains owner
+        else if(!_collaborators.contains(widget.owner)) _assigneeCandidate.add(_repo.owner); //add owner if does not contains owner
                     await Navigator.of(context).push<bool>(MaterialPageRoute(
-                                            builder: (context)=>Issues(repo: widget.repo,
+                                            builder: (context)=>Issues(repo: _repo,
                                                                         issue: issue,
                                                                         repoIssues: _issues,
                                                                         repoLabels: _labels,
@@ -410,18 +417,20 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getREADME(){
-    getDefaultREADME(widget.repo.owner.username,widget.repo.name,widget.repo.defaultBranch).then((v){
-      if(this.mounted){
-        setState(() {
-          _readme = v;
-          _readmeLoading = false;
-        });
-      }
-    });
+    if(_repo != null){
+      getDefaultREADME(widget.repoName,widget.repoName,_repo.defaultBranch).then((v){
+        if(this.mounted){
+          setState(() {
+            _readme = v;
+            _readmeLoading = false;
+          });
+        }
+      });
+    }
   }
 
   void _getIssues(){
-    getRepoIssues(widget.repo.owner.username,widget.repo.name).then((v){
+    getRepoIssues(widget.owner,widget.repoName).then((v){
       if(this.mounted){
         setState(() {
           _issues.clear();
@@ -432,7 +441,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getLables(){
-    getRepoLabels(widget.repo.owner.username,widget.repo.name).then((v){
+    getRepoLabels(widget.owner,widget.repoName).then((v){
       if(this.mounted){
         setState(() {
           _labels.clear();
@@ -443,7 +452,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getMilestones(){
-    getRepoMilestones(widget.repo.owner.username,widget.repo.name).then((v){
+    getRepoMilestones(widget.owner,widget.repoName).then((v){
       if(this.mounted){
         setState(() {
           _milestones.clear();
@@ -454,7 +463,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
   }
 
   void _getCollaborators(){
-    getRepoCollaborators(widget.repo.owner.username,widget.repo.name).then((v){
+    getRepoCollaborators(widget.owner,widget.repoName).then((v){
       if(this.mounted){
         setState(() {
           _collaborators.clear();
@@ -466,7 +475,7 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
 
   void _getOwnerMembers(){
     if(widget.isOwnerOrg){
-      getOrgMembers(widget.repo.owner.username)
+      getOrgMembers(widget.owner)
         .then((v){
           if(this.mounted){
             setState(() {
@@ -477,6 +486,18 @@ class RepositoryState extends State<Repository> with SingleTickerProviderStateMi
         });
     }
   }
+
+  void _getRepoInfo(){
+    getRepoInfo(widget.owner,widget.repoName).then((v){
+      if(this.mounted){
+        setState(() {
+                  _repo=v;
+        });
+        _getREADME();
+      }
+    });
+  }
+
 }
 
 

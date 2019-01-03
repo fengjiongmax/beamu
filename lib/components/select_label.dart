@@ -36,7 +36,9 @@ class _LabelSelectorState extends State<LabelSelector>{
                       color:y<128? Colors.white : Colors.black,
                     ),
                   ),
-                  trailing: widget.selectedLabels != null && widget.selectedLabels.contains(l)? Icon(Icons.check,color: y<128? Colors.white : Colors.black,):null,
+                  trailing: widget.selectedLabels != null && widget.selectedLabels.map((f){
+                    return f.id;
+                  }).toList().contains(l.id)? Icon(Icons.check,color: y<128? Colors.white : Colors.black,):null,
                   onTap: (){
                     if(widget.selectedLabels.contains(l))
                     {

@@ -51,7 +51,7 @@ class RepositoriesListDisplay extends StatelessWidget{
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Repository(repo: repo,isOwnerOrg: isOwnerOrg,)
+                      builder: (context) => Repository(owner: repo.owner.username,repoName: repo.name,isOwnerOrg: isOwnerOrg,)
                     )
                   );
                 },

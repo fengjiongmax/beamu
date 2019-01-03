@@ -32,3 +32,13 @@ Future<String> getDefaultREADME(String ownerName,String repoName,String branchNa
 
   return response.statusCode == 200? response.body : null;
 }
+
+Future<RepositoryModel> getRepoInfo(String ownerName,String repoName) async{
+  final url = config.giteaHost+'/api/v1/repos/'
+                              +ownerName+'/'
+                              +repoName;
+  final response = await httpGet(url);
+  final _parsed = json.decode(response.body);
+  RepositoryModel _returnRepo = RepositoryModel.fromJson(_parsed);
+  return _returnRepo;
+}

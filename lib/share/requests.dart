@@ -28,3 +28,18 @@ Future<Response> httpPatch(String url,dynamic body,[Map<String,String> header]) 
                             headers: header==null? _defaultHeader:header
                             );
 }
+
+Future<Response> httpPut(String url,dynamic body,[Map<String,String> header]) async{
+  Client client = Client();
+  return await client.put(Uri.encodeFull(url),
+                            body: body,
+                            headers: header==null? _defaultHeader:header
+                            );
+}
+
+Future<Response> httpDelete(String url,[Map<String,String> header]) async{
+  Client client = Client();
+  return await client.delete(Uri.encodeFull(url),
+                            headers: header==null? _defaultHeader:header
+                            );
+}

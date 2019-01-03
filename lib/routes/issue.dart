@@ -14,6 +14,7 @@ import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/app/tab_choice.dart';
 
 import 'package:beamu/data/issue_data.dart';
+import 'package:beamu/data/label_data.dart';
 
 import 'package:beamu/components/markdown_render.dart';
 import 'package:beamu/components/loading.dart';
@@ -56,6 +57,7 @@ class Issues extends StatefulWidget{
 class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   IssueModel _renderIssue;
   TextEditingController _titleEditController;
+  List<LabelModel> _originLabels;
   FocusNode _focusNode = new FocusNode();
   var _comments = new List<IssueCommentModel>();
   bool _commentsLoading = true;
@@ -80,6 +82,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   void initState(){
     // _issueUpdated=false;
     _renderIssue = widget.issue;
+    _originLabels = widget.issue.labels == null? null: widget.issue.labels.where((w){return true;}).toList();
     if(_commentsLoading ){
       _getComments();
     }
@@ -239,7 +242,7 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
       createList.add(Container(
         margin: EdgeInsets.all(10),
         child:Center(
-          child: Text('-- discuttion ends here --',style: TextStyle(color: Colors.grey),),)
+          child: Text('-- discussion ends here --',style: TextStyle(color: Colors.grey),),)
         )
       );
     }
@@ -267,8 +270,10 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
                     selectedLabels: widget.issue.labels,
                   )
               ).then((v){
-                  widget.issue.labels.sort((a,b){return a.id>b.id?1:0;});//sort by the order as shown in the labels list
-                  setState(() { });
+                  _updateLables().then((v){
+                    widget.issue.labels.sort((a,b){return a.id>b.id?1:0;});//sort by the order as shown in the labels list
+                    setState(() {});
+                  });
                 }
               );
             },
@@ -477,7 +482,6 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
   } 
 
   Future<void> _saveTitle() async{
-    //TODO: save issue everytime when change value from discussions or properties
     _focusNode.unfocus();
     widget.issue.title = _titleEditController.text;
     var updated = await updateIssue(widget.repo.owner.username,widget.repo.name, widget.issue);
@@ -493,6 +497,29 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
       _editTitle=false;
     });
     Navigator.pop(context);
+  }
+
+  Future<void> _updateLables() async{
+    if(widget.issue.labels == null || widget.issue.labels.length==0){
+      await removeIssueLabels(widget.repo.owner.username, widget.repo.name,widget.issue.number);
+      return;
+    }
+
+    if(_originLabels == widget.issue.labels){
+      return;
+    }
+
+    //prepare the issue indices
+    List<int> _labelIndeces = widget.issue.labels.map((m) {
+      return m.id;
+    }).toList();
+
+    if(_originLabels == null || _originLabels.length == 0){
+      await createIssueLabels(widget.repo.owner.username, widget.repo.name,widget.issue.number, _labelIndeces);
+    }
+    else{
+      await updateIssueLabels(widget.repo.owner.username, widget.repo.name,widget.issue.number, _labelIndeces);
+    }
   }
 
   @override
