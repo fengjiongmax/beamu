@@ -1,4 +1,6 @@
-// library secure_config;
+/*
+share/authorizations.dart
+*/
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

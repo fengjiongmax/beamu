@@ -1,3 +1,7 @@
+/*
+model/permission_model.dart
+*/
+
 class PermissionModel{
   PermissionModel({
     this.admin,

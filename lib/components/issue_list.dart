@@ -1,3 +1,7 @@
+/*
+components/issue_list.dart
+*/
+
 import 'package:flutter/material.dart';
 
 import 'package:beamu/routes/issue.dart';

@@ -1,3 +1,7 @@
+/*
+components/center_text.dart
+*/
+
 import 'package:flutter/material.dart';
 
 class CenterText extends StatelessWidget{

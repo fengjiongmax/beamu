@@ -1,3 +1,7 @@
+/*
+routes/issue.dart
+*/
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -12,6 +16,7 @@ import 'package:beamu/model/label_model.dart';
 import 'package:beamu/model/milestone_model.dart';
 import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/app/tab_choice.dart';
+import 'package:beamu/model/tracked_time_model.dart';
 
 import 'package:beamu/data/issue_data.dart';
 import 'package:beamu/data/label_data.dart';
@@ -293,24 +298,25 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
         ListTile(
           leading: Text('Milestones'),
           title: Divider(color: Colors.grey,),
-          trailing: IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: (){
-              showDialog(
-                context: context,
-                builder: (context) => new MilestoneSelector(
-                  repoMilestones: widget.repoMilestones,
-                  selectedMilestone: widget.issue.milestone,
-                  onSelected: (m){
-                    setState(() {
-                      widget.issue.milestone=m;
-                    });
-                    Navigator.pop(context);
-                  },
-                )
-              );
-            },
-          ),
+          //milestone api for issues are not available yet.
+          // trailing: IconButton(
+          //   icon: Icon(Icons.settings),
+          //   onPressed: (){
+          //     showDialog(
+          //       context: context,
+          //       builder: (context) => new MilestoneSelector(
+          //         repoMilestones: widget.repoMilestones,
+          //         selectedMilestone: widget.issue.milestone,
+          //         onSelected: (m){
+          //           setState(() {
+          //             widget.issue.milestone=m;
+          //           });
+          //           Navigator.pop(context);
+          //         },
+          //       )
+          //     );
+          //   },
+          // ),
         ),
         widget.issue.milestone == null?
           CenterText(centerText:'No milestone')
@@ -327,21 +333,22 @@ class IssuesState extends State<Issues> with SingleTickerProviderStateMixin{
         ListTile(
           leading: Text('Asignees'),
           title: Divider(color: Colors.grey,),
-          trailing: IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: (){
-              showDialog(
-                context: context,
-                builder: (context) => new AssigneeSelector(
-                  assigneeCandidate: widget.assigneeCandidate,
-                  assignees: widget.issue.assignees,
-                )
-              ).then((v){
-                widget.issue.assignees.sort((a,b){return a.id>b.id? 1:0;});
-                setState(() { });
-              });
-            },
-          ),
+          // assignees api for issue is not available
+          // trailing: IconButton(
+          //   icon: Icon(Icons.settings),
+          //   onPressed: (){
+          //     showDialog(
+          //       context: context,
+          //       builder: (context) => new AssigneeSelector(
+          //         assigneeCandidate: widget.assigneeCandidate,
+          //         assignees: widget.issue.assignees,
+          //       )
+          //     ).then((v){
+          //       widget.issue.assignees.sort((a,b){return a.id>b.id? 1:0;});
+          //       setState(() { });
+          //     });
+          //   },
+          // ),
         ),
         widget.issue.assignees == null || widget.issue.assignees.length ==0?
           CenterText(centerText:'No Assignees')

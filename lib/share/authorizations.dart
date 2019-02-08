@@ -1,3 +1,7 @@
+/*
+share/authorizations.dart
+*/
+
 import 'dart:convert';
 
 import 'package:beamu/model/user_model.dart';

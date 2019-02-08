@@ -1,3 +1,7 @@
+/*
+components/user_display.dart
+*/
+
 import 'package:flutter/material.dart';
 
 import 'package:beamu/model/user_model.dart';

@@ -1,3 +1,7 @@
+/*
+model/repository_model.dart
+*/
+
 import 'package:beamu/model/user_model.dart';
 import 'package:beamu/model/permission_model.dart';
 

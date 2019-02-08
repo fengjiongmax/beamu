@@ -1,3 +1,7 @@
+/*
+components/loading.dart
+*/
+
 import 'package:flutter/material.dart';
 
 class LoadingContent extends StatelessWidget{

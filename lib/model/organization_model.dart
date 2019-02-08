@@ -1,3 +1,7 @@
+/*
+model/organization_model.dart
+*/
+
 class OrganizationModel{
   OrganizationModel({
     this.id ,
